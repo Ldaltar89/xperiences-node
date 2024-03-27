@@ -1,0 +1,114 @@
+# 1.- Subir el proyecto a un repo github
+
+{PATCH: "delete"} Solo debes Inactivar el registro.
+
+season:
+  - /season : {POST: "crear"} 
+  - /season/{id} : {GET: "show"}
+  - /season/{id} : {PUT: "update"}
+  - /season/{id} : {PATCH: "delete"}
+
+imagenes = > /public/season/2024_03_26/1234567890_random.ext (png, jpg, pjeg)
+
+university:
+  - /university : {POST: "crear"} 
+  - /university/{id} : {GET: "show"}
+  - /university/{id} : {PUT: "update"}
+  - /university/{id} : {PATCH: "delete"}
+
+{idSeason}
+contract:
+  - /contract : {POST: "crear"} 
+  - /contract/{id} : {GET: "show"}
+  - /contract/{id} : {PUT: "update"}
+  - /contract/{id} : {PATCH: "delete"}
+  table:
+    - id
+    - nombre
+    - descripcion
+    - contracto (varchar(4000))
+    - seasonId
+    - audit
+
+{idSeason + idContract + idUser}
+user_contract:
+  - /user-contract : {POST: "crear"} 
+  - /user-contract/{id} : {GET: "show"}
+  - /user-contract/{id} : {PUT: "update"}
+  - /user-contract/{id} : {PATCH: "delete"}
+
+user:
+  - /user : {POST: "crear"} 
+  - /user/{id} : {GET: "show"}
+  - /user/{id} : {PUT: "update"}
+  - /user/{id} : {PATCH: "delete"}
+  - Firts Name
+  - Last Name
+  - dni => Identification
+  - email
+  - password
+
+payments:
+  - /payments : {POST: "crear"} 
+  - /payments/{id} : {GET: "show"}
+  - /payments/{id} : {PUT: "update"}
+  - /payments/{id} : {PATCH: "delete"}
+  table:
+    - id
+    - name ()nombre quien hace el pago
+    - reference (numero comprobante pago) unique
+    - description
+    - total
+    - image (debe subir el comprobante de pago)
+    - isApproved
+    - isRejected
+    - isCancel
+    - audit
+
+imagenes = > /public/payments/2024_03_26/1234567890_random.ext (png, jpg, pjeg)
+
+examns:
+  - /examns : {POST: "crear"} 
+  - /examns/{id} : {GET: "show"}
+  - /examns/{id} : {PUT: "update"}
+  - /examns/{id} : {PATCH: "delete"}
+
+questions:
+  - /user : {POST: "crear"} 
+  - /user/{id} : {GET: "show"}
+  - /user/{id} : {PUT: "update"}
+  - /user/{id} : {PATCH: "delete"}
+
+answers:
+  - /user : {POST: "crear"} 
+  - /user/{id} : {GET: "show"}
+  - /user/{id} : {PUT: "update"}
+  - /user/{id} : {PATCH: "delete"}
+
+{idUser + idExamn}
+user_examns:
+  - /user-examns : {POST: "crear"} 
+  - /user-examns/{id} : {GET: "show"}
+  - /user-examns/{id} : {PUT: "update"}
+  - /user-examns/{id} : {PATCH: "delete"}
+
+user_questions:
+  - /user-questions : {POST: "crear"} 
+  - /user-questions/{id} : {GET: "show"}
+  - /user-questions/{id} : {PUT: "update"}
+  - /user-questions/{id} : {PATCH: "delete"}
+
+user_answers:
+  - /user-answers : {POST: "crear"} 
+  - /user-answers/{id} : {GET: "show"}
+  - /user-answers/{id} : {PUT: "update"}
+  - /user-answers/{id} : {PATCH: "delete"}
+
+
+
+----------------------------------------
+front:
+  - register
+  - login
+  - reset password
+  - menu-bar admin 
