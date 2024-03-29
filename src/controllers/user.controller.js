@@ -67,7 +67,6 @@ const deleteUser = async (req, res) => {
 //Confirmar cuenta
 const getUserConfirmation = async (req, res) => {
   const { email } = req.params;
-  console.log(email,"asd");
   try {
     const user = await User.findOne({ where: { email } });
     if (!user) {
