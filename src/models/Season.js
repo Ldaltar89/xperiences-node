@@ -50,11 +50,6 @@ const Season = Sequelize.define("Season", {
   },
   season_image: {
     type: DataTypes.STRING(255),
-    validate: {
-      isUrl: {
-        msg: "La URL de la imagen de la temporada debe ser válida.",
-      },
-    },
   },
   isActive: {
     type: DataTypes.BOOLEAN,

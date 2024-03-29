@@ -10,14 +10,8 @@ const getPayments = async (req, res) => {
 };
 
 const createPayment = async (req, res) => {
-  const { name, reference, total, imagen } = req.body;
   try {
-    const newPayment = await Payment.create({
-      name,
-      reference,
-      total,
-      imagen,
-    });
+    const newPayment = await Payment.create(req.body);
     return res.status(200).json({ msg: "Payment Realizado", newPayment });
   } catch (error) {
     return res.status(500).json({ message: error.message });

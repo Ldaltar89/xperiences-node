@@ -3,19 +3,22 @@ const Question = require("../models/Question.js");
 const getQuestions = async (req, res) => {
   try {
     const question = await Question.findAll();
-    return res.status(200).json(question);
+    if (!question) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error al Listar Questions",
+      });
+    }
+    return res.status(200).json({ ok: true, question });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ ok: false,
+      msg: "Ocurrio un error al cargar el Listado de Questions", });
   }
 };
 
 const createQuestion = async (req, res) => {
-  const { question, question_type } = req.body;
   try {
-    const newQuestion = await Question.create({
-      question,
-      question_type,
-    });
+    const newQuestion = await Question.create(req.body);
     return res.status(200).json({ msg: "Question Creado", newQuestion });
   } catch (error) {
     return res.status(500).json({ message: error.message });

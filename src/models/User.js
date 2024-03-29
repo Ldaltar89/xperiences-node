@@ -103,11 +103,6 @@ const User = Sequelize.define(
     },
     user_image: {
       type: DataTypes.STRING(255),
-      validate: {
-        isUrl: {
-          msg: "La URL de la imagen del usuario debe ser válida.",
-        },
-      },
     },
     gender: {
       type: DataTypes.STRING(20),

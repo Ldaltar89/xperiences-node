@@ -60,10 +60,7 @@ const Payment = Sequelize.define("Payment", {
     allowNull: false,
     validate: {
       notEmpty: {
-        msg: "La URL de la imagen es obligatoria.",
-      },
-      isUrl: {
-        msg: "La URL de la imagen debe ser válida.",
+        msg: "La imagen es obligatoria.",
       },
     },
   },
