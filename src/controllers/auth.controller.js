@@ -18,14 +18,22 @@ const loginUser = async (req, res) => {
       });
 
     //Generar nuestro JWT
-    const token = await generarJWY(user.id, user.email);
-    console.log(token, "sdfsdf");
+    const token = await generarJWY(
+      user.id,
+      user.email,
+      user.name,
+      user.lastname,
+      user.rol
+    );
 
     return res.json({
       ok: true,
-      msg: "Usuario Loegueado",
+      msg: "Usuario Logueado",
       id: user.id,
       email: user.email,
+      name: user.name,
+      lastname: user.lastname,
+      rol: user.rol,
       token,
     });
   } catch (error) {
@@ -34,12 +42,18 @@ const loginUser = async (req, res) => {
 };
 
 const revalidateToken = async (req, res) => {
-  const { email, password } = req.body;
-  res.json({
+  const { id, email, name, lastname, rol } = req;
+
+  const token = await generarJWY(id, email, name, lastname, rol);
+
+  return res.status(200).json({
     ok: true,
-    msg: "token",
+    id,
     email,
-    password,
+    name,
+    lastname,
+    rol,
+    token,
   });
 };
 

@@ -22,7 +22,6 @@ const createUser = async (req, res) => {
     });
     sendMail(newUser);
 
-    //const token = await generarJWY(newUser.id, newUser.name);
     return res.json({ ok: true, newUser });
   } catch (error) {
     return res.status(500).json({ message: error.message });

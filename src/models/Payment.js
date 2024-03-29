@@ -23,6 +23,10 @@ const Payment = Sequelize.define("Payment", {
   reference: {
     type: DataTypes.STRING(255),
     allowNull: false,
+    unique: {
+      args: true,
+      msg: "La referencia ya fue usada.",
+    },
     validate: {
       notEmpty: {
         msg: "La referencia es obligatoria.",

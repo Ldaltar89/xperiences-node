@@ -9,6 +9,10 @@ const {
 
 const router = Router();
 
+const { validarJWT } = require("../middlewares/validar-jwr.js");
+
+router.use(validarJWT);
+
 router.get("/", getPayments);
 router.post("/", createPayment);
 router.put("/:id", updatePayment);

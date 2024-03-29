@@ -9,15 +9,15 @@ const {
   getUserConfirmation,
 } = require("../controllers/user.controller.js");
 
-router.get("/", getUsers);
+const { validarJWT } = require("../middlewares/validar-jwr.js");
+
+router.get("/", validarJWT, getUsers);
 router.post("/", createUser);
-router.put("/:id", updateUser);
-router.patch("/:id", deleteUser);
-router.get("/:id", getUser);
+router.put("/:id", validarJWT, updateUser);
+router.patch("/:id", validarJWT, deleteUser);
+router.get("/:id", validarJWT, getUser);
 
 //Confirmar cuenta
 router.get("/verification/:email", getUserConfirmation);
 
-
 module.exports = router;
-

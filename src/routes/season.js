@@ -8,6 +8,9 @@ const {
 } = require("../controllers/season.controller.js");
 
 const router = Router();
+const { validarJWT } = require("../middlewares/validar-jwr.js");
+
+router.use(validarJWT);
 
 router.get("/", getSeasons);
 router.post("/", createSeason);

@@ -1,12 +1,13 @@
-const app = require("./app.js")
+const app = require("./app.js");
 require("dotenv").config();
-const Sequelize = require("./database/database.js")
+const Sequelize = require("./database/database.js");
 
 // const User = require("./models/User.js");
 // const University = require("./models/University.js");
 // const Season = require("./models/Season.js");
 // const Contract = require("./models/Contract.js");
-//  const ExamType = require("./models/ExamType.js");
+// const ExamType = require("./models/ExamType.js");
+// const Exam = require("./models/Exam.js");
 
 async function main() {
   try {

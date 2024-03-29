@@ -9,6 +9,10 @@ const {
 
 const router = Router();
 
+const { validarJWT } = require("../middlewares/validar-jwr.js");
+
+router.use(validarJWT);
+
 router.get("/", getUniversities);
 router.post("/", createUniversity);
 router.put("/:id", updateUniversity);

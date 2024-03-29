@@ -89,7 +89,6 @@ const sendMail = async (user) => {
       },
     ],
   });
-  console.log("message sent: %s", info.messageId);
   return;
 };
 

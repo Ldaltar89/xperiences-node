@@ -16,6 +16,7 @@ app.use("/api/auth", require("./routes/auth.js"));
 app.use("/api/contract", require("./routes/contract.js"));
 app.use("/api/payment", require("./routes/payment.js"));
 app.use("/api/examType", require("./routes/examType.js"));
+app.use("/api/exam", require("./routes/exam.js"));
 
 
 // export default app;

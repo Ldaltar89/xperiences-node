@@ -84,12 +84,7 @@ const User = Sequelize.define(
     },
     rol: {
       type: DataTypes.STRING(255),
-      validate: {
-        isIn: {
-          args: [["admin", "usuario"]],
-          msg: 'El rol debe ser "admin" o "usuario".',
-        },
-      },
+      defaultValue: "usuario",
     },
     birthday: {
       type: DataTypes.DATE,
