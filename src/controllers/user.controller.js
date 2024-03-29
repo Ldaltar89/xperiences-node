@@ -78,19 +78,32 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findOne({ where: { id } });
+    const _user = await User.findOne({ where: { id } });
 
-    if (!user) {
+    if (!_user) {
       return res.status(401).json({
         ok: false,
         msg: "Error con el id del User",
       });
     }
 
-    const result = await User.update({ isActive: false }, { where: { id } });
-    return res
-      .status(200)
-      .json({ ok: true, result, msg: "Eliminado Correctamente" });
+    const [row, [updateUser]] = await User.update(
+      { isActive: false },
+      { where: { id }, returning: true }
+    );
+    if (row > 0) {
+      return res
+        .status(200)
+        .json({
+          ok: true,
+          user: { ...updateUser.dataValues },
+          msg: "Eliminado Correctamente",
+        });
+    } else {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No se pudo eliminar el usuario" });
+    }
   } catch (error) {
     return res
       .status(500)
@@ -115,7 +128,9 @@ const getUserConfirmation = async (req, res) => {
       .status(200)
       .json({ ok: true, message: "Confirmado correctamente" });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: "Error al confirmar el email"});
+    return res
+      .status(500)
+      .json({ ok: false, msg: "Error al confirmar el email" });
   }
 };
 
