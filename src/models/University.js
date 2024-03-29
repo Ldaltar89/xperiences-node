@@ -73,6 +73,7 @@ const University = Sequelize.define("University", {
   },
 });
 
+// Relación entre University y User
 University.hasMany(User, {
   foreignKey: "universityId",
   sourceKey: "id",

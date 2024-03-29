@@ -1,6 +1,8 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
 const bcrypt = require("bcrypt");
+const Payment = require("./Payment.js");
+const UserContract = require("./UserContract.js");
 
 const User = Sequelize.define(
   "User",
@@ -134,19 +136,12 @@ const User = Sequelize.define(
     //Se encrypta la contraseña
     hooks: {
       beforeCreate(user) {
-        // //Se asigna el usuario actual como createdBy
-        // user.createdBy = getCurrentUser();
-        // //Se encrypta la contraseña
         user.password = bcrypt.hashSync(
           user.password,
           bcrypt.genSaltSync(),
           null
         );
       },
-      // beforeUpdate(user) {
-      //   // Se asigna el usuario actual como updatedBy
-      //   user.updatedBy = getCurrentUser();
-      // },
     },
   }
 );
@@ -156,20 +151,27 @@ User.prototype.validarPassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-// const getCurrentUser = (User) => {
-//   // Verifica si el usuario es válido y tiene la estructura esperada
-//   if (
-//     User &&
-//     typeof user === "object" &&
-//     User.name &&
-//     User.email
-//   ) {
-//     // Si el usuario es válido, devolverlo
-//     return user;
-//   } else {
-//     // Si el usuario no es válido, devolver null o manejar el error según sea necesario
-//     return null;
-//   }
-// };
+
+// Relación entre User y Payment
+User.hasMany(Payment, {
+  foreignKey: 'userId',
+  sourceKey: 'id',
+});
+
+Payment.belongsTo(User, {
+  foreignKey: 'userId',
+  targetKey: 'id',
+});
+
+// Relación entre User y UserContract
+User.hasMany(UserContract, {
+  foreignKey: 'userId',
+  sourceKey: 'id',
+});
+
+UserContract.belongsTo(User, {
+  foreignKey: 'userId',
+  targetKey: 'id',
+});
 
 module.exports = User;

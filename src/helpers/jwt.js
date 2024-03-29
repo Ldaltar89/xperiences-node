@@ -8,7 +8,7 @@ const generarJWY = async (id, email, name, lastname, rol) => {
       payload,
       process.env.SECRET_JWT_SEED,
       {
-        expiresIn: "2h",
+        expiresIn: "24h",
       },
       (err, token) => {
         if (err) {

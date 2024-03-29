@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
+const UserContract = require("./UserContract.js");
 
 
 const Contract = Sequelize.define('Contract', {
@@ -61,6 +62,17 @@ const Contract = Sequelize.define('Contract', {
   updatedBy: {
     type: DataTypes.STRING(100),
   },
+});
+
+// Relación entre Contract y UserContract
+Contract.hasMany(UserContract, {
+  foreignKey: 'contractId',
+  sourceKey: 'id',
+});
+
+UserContract.belongsTo(Contract, {
+  foreignKey: 'contractId',
+  targetKey: 'id',
 });
 
 

@@ -8,6 +8,8 @@ const Sequelize = require("./database/database.js");
 // const Contract = require("./models/Contract.js");
 // const ExamType = require("./models/ExamType.js");
 // const Exam = require("./models/Exam.js");
+// const Question = require("./models/Question.js");
+// const UserContract = require("./models/UserContract.js");
 
 async function main() {
   try {

@@ -2,6 +2,9 @@ const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
 const User = require("./User.js");
 const Contract = require("./Contract.js");
+const UserContract = require("./UserContract.js");
+const Payment = require("./Payment.js");
+const Exam = require("./Exam.js");
 
 
 const Season = Sequelize.define("Season", {
@@ -91,6 +94,39 @@ Season.hasMany(Contract, {
 });
 
 Contract.belongsTo(Season, {
+  foreignKey: 'seasonId',
+  targetKey: 'id',
+});
+
+// Relación entre Season y UserContract
+Season.hasMany(UserContract, {
+  foreignKey: 'seasonId',
+  sourceKey: 'id',
+});
+
+UserContract.belongsTo(Season, {
+  foreignKey: 'seasonId',
+  targetKey: 'id',
+});
+
+// Relación entre Season y Payment
+Season.hasMany(Payment, {
+  foreignKey: 'seasonId',
+  sourceKey: 'id',
+});
+
+Payment.belongsTo(Season, {
+  foreignKey: 'seasonId',
+  targetKey: 'id',
+});
+
+// Relación entre Season y Exam
+Season.hasMany(Exam, {
+  foreignKey: 'seasonId',
+  sourceKey: 'id',
+});
+
+Exam.belongsTo(Season, {
   foreignKey: 'seasonId',
   targetKey: 'id',
 });
