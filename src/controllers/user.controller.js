@@ -13,14 +13,18 @@ const getUsers = async (req, res) => {
 const createUser = async (req, res) => {
   const { name, lastname, dni, email, password } = req.body;
   try {
-    const newUser = await User.create({
-      name,
-      lastname,
-      dni,
-      email,
-      password,
-    });
+    const newUser = User.build();
+    newUser.set(req.body); // Establece los valores de los campos del modelo
+    await newUser.save(); // Guarda el usuario en la base de datos
     sendMail(newUser);
+    // const newUser = await User.create({
+    //   name,
+    //   lastname,
+    //   dni,
+    //   email,
+    //   password,
+    // });
+    // sendMail(newUser);
 
     return res.json({ ok: true, newUser });
   } catch (error) {
