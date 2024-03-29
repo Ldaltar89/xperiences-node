@@ -86,7 +86,12 @@ const User = Sequelize.define(
     },
     rol: {
       type: DataTypes.STRING(255),
-      defaultValue: "usuario",
+      validate: {
+        len: {
+          args: [3, 255],
+          msg: "El rol debe tener entre 3 y 255 caracteres.",
+        },
+      },
     },
     birthday: {
       type: DataTypes.DATE,
@@ -107,9 +112,9 @@ const User = Sequelize.define(
     gender: {
       type: DataTypes.STRING(20),
       validate: {
-        isIn: {
-          args: [["masculino", "femenino"]],
-          msg: 'El género debe ser "masculino" o "femenino".',
+        len: {
+          args: [3, 255],
+          msg: "El genero debe tener entre 3 y 20 caracteres.",
         },
       },
     },
