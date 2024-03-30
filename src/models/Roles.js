@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
 const User = require('./User.js')
+
 const Rol = Sequelize.define('Rol', {
   id: {
     type: DataTypes.UUID,
@@ -22,12 +23,6 @@ const Rol = Sequelize.define('Rol', {
   },
   description: {
     type: DataTypes.STRING(255),
-    validate: {
-      len: {
-        args: [1, 255],
-        msg: "La descripción del rol debe tener entre 1 y 255 caracteres."
-      }
-    }
   },
   isActive: {
     type: DataTypes.BOOLEAN,
@@ -50,14 +45,14 @@ const Rol = Sequelize.define('Rol', {
 });
 
 // Relación entre Rol y User
-Rol.hasMany(User, {
-  foreignKey: 'rolId',
-  sourceKey: 'id',
-});
+// Rol.hasMany(User, {
+//   foreignKey: 'rolId',
+//   sourceKey: 'id',
+// });
 
-User.belongsTo(Rol, {
-  foreignKey: 'rolId',
-  targetKey: 'id',
-});
+// User.belongsTo(Rol, {
+//   foreignKey: 'rolId',
+//   targetKey: 'id',
+// });
 
 module.exports = Rol;

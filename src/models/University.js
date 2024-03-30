@@ -84,4 +84,5 @@ User.belongsTo(University, {
   targetId: "id",
 });
 
+
 module.exports = University;
