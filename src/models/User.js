@@ -94,12 +94,7 @@ const User = Sequelize.define(
       },
     },
     birthday: {
-      type: DataTypes.DATE,
-      validate: {
-        isDate: {
-          msg: "La fecha de nacimiento debe ser válida.",
-        },
-      },
+      type: DataTypes.STRING(100),
     },
     user_image: {
       type: DataTypes.STRING(255),
