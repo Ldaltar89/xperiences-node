@@ -20,8 +20,8 @@ const User = Sequelize.define(
           msg: "El nombre es obligatorio.",
         },
         len: {
-          args: [5, 100],
-          msg: "El nombre debe tener entre 5 y 100 caracteres.",
+          args: [1, 100],
+          msg: "El nombre debe tener entre 1 y 100 caracteres.",
         },
       },
     },
@@ -33,8 +33,8 @@ const User = Sequelize.define(
           msg: "El apellido es obligatorio.",
         },
         len: {
-          args: [5, 100],
-          msg: "El apellido debe tener entre 5 y 100 caracteres.",
+          args: [1, 100],
+          msg: "El apellido debe tener entre 1 y 100 caracteres.",
         },
       },
     },

@@ -21,11 +21,19 @@ const getUsers = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
+    const { name, lastname, dni, email, password } = req.body;
+    if (!name || !lastname || !dni || !email || !password) {
+      return res
+        .status(400)
+        .json({ ok: false, msg: "Faltan datos obligatorios." });
+    }
     const newUser = await User.create(req.body);
     sendMail(newUser);
-    return res.status(200).json({ ok: true, newUser, msg: "Creado correctamente" });
+    return res
+      .status(200)
+      .json({ ok: true, newUser, msg: "Creado correctamente" });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: "Error al crear usuario" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -69,10 +77,8 @@ const updateUser = async (req, res) => {
       msg: "Actualizado correctamente",
     });
   } catch (error) {
-    console.log(error,"error");
-    return res
-      .status(500)
-      .json({ ok: false, error:error.message });
+    console.log(error, "error");
+    return res.status(500).json({ ok: false, error: error.message });
   }
 };
 
@@ -92,13 +98,11 @@ const deleteUser = async (req, res) => {
       { where: { id }, returning: true }
     );
     if (row > 0) {
-      return res
-        .status(200)
-        .json({
-          ok: true,
-          user: { ...updateUser.dataValues },
-          msg: "Eliminado correctamente",
-        });
+      return res.status(200).json({
+        ok: true,
+        user: { ...updateUser.dataValues },
+        msg: "Eliminado correctamente",
+      });
     } else {
       return res
         .status(404)
