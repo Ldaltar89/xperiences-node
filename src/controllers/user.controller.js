@@ -69,9 +69,10 @@ const updateUser = async (req, res) => {
       msg: "Actualizado correctamente",
     });
   } catch (error) {
+    console.log(error,"error");
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al actualizar el usuario" });
+      .json({ ok: false, error:error.message });
   }
 };
 
