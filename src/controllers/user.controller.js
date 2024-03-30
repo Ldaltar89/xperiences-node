@@ -92,7 +92,7 @@ const updateUser = async (req, res) => {
       });
     }
     // Si se proporcionó una nueva contraseña en la solicitud, encriptarla
-    if (password) {
+    if (password != user.password) {
       const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
       req.body.password = hashedPassword; // Actualizar la contraseña en el cuerpo de la solicitud
     }
