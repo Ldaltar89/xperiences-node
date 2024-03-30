@@ -13,7 +13,7 @@ const getUserContracts = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el listado de contratos de usuarios",
+      msg: error.message
     });
   }
 };
@@ -27,7 +27,7 @@ const createUserContract = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al crear contrato del usuario" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -40,14 +40,14 @@ const getUserContract = async (req, res) => {
     if (!userContract) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id del contrato del usuario",
+        msg: error.message
       });
     }
     return res.status(200).json({ ok: true, userContract });
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar elcontrato del usuario" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -60,7 +60,7 @@ const updateUserContract = async (req, res) => {
     if (!userContract) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id del contrato del usuario",
+        msg: error.message
       });
     }
     userContract.set(req.body);
@@ -71,7 +71,7 @@ const updateUserContract = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al actualizar el contrato del usuario" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -106,7 +106,7 @@ const deleteUserContract = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al Eliminar el contrato del usuario" });
+      .json({ ok: false, msg: error.message });
   }
 };
 

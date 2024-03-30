@@ -12,7 +12,7 @@ const getQuestions = async (req, res) => {
     return res.status(200).json({ ok: true, question });
   } catch (error) {
     return res.status(500).json({ ok: false,
-      msg: "Ocurrio un error al cargar el Listado de Questions", });
+      msg: error.message });
   }
 };
 

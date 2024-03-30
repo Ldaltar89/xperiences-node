@@ -13,7 +13,7 @@ const getPayments = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el listado de pagos",
+      msg: error.message
     });
   }
 };
@@ -25,7 +25,7 @@ const createPayment = async (req, res) => {
       .status(200)
       .json({ ok: true, newPayment, msg: "Creado correctamente" });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: "Error al crear el pago" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -45,7 +45,7 @@ const getPayment = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar el pago" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -69,7 +69,7 @@ const updatePayment = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al actualizar el pago" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -103,7 +103,7 @@ const deletedPayment = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al eliminar el pago" });
+      .json({ ok: false, msg: error.message });
   }
 };
 

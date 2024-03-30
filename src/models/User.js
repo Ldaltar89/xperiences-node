@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const Payment = require("./Payment.js");
 const UserContract = require("./UserContract.js");
 
+
 const User = Sequelize.define(
   "User",
   {
@@ -86,12 +87,6 @@ const User = Sequelize.define(
     },
     rol: {
       type: DataTypes.STRING(255),
-      validate: {
-        len: {
-          args: [3, 255],
-          msg: "El rol debe tener entre 3 y 255 caracteres.",
-        },
-      },
     },
     birthday: {
       type: DataTypes.STRING(100),
@@ -146,27 +141,26 @@ User.prototype.validarPassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-
 // Relación entre User y Payment
 User.hasMany(Payment, {
-  foreignKey: 'userId',
-  sourceKey: 'id',
+  foreignKey: "userId",
+  sourceKey: "id",
 });
 
 Payment.belongsTo(User, {
-  foreignKey: 'userId',
-  targetKey: 'id',
+  foreignKey: "userId",
+  targetKey: "id",
 });
 
 // Relación entre User y UserContract
 User.hasMany(UserContract, {
-  foreignKey: 'userId',
-  sourceKey: 'id',
+  foreignKey: "userId",
+  sourceKey: "id",
 });
 
 UserContract.belongsTo(User, {
-  foreignKey: 'userId',
-  targetKey: 'id',
+  foreignKey: "userId",
+  targetKey: "id",
 });
 
 module.exports = User;

@@ -13,7 +13,7 @@ const getContracts = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el listado de contrato",
+      msg: error.message,
     });
   }
 };
@@ -25,7 +25,7 @@ const createContract = async (req, res) => {
       .status(200)
       .json({ ok: true, newContract, msg: "Creado correctamente" });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: "Error al crear contrato" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -43,9 +43,7 @@ const getContract = async (req, res) => {
     }
     return res.status(200).json({ ok: true, contract });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar el contrato" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -67,9 +65,8 @@ const updateContract = async (req, res) => {
       .status(200)
       .json({ ok: true, contract, msg: "Actualizado correctamente" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: "Error al actualizar contrato" });
+    console.log(error, "error");
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -83,27 +80,23 @@ const deleteContract = async (req, res) => {
         msg: "Error con el id del contrato",
       });
     }
-  const [row, [updateContract]] = await Contract.update(
+    const [row, [updateContract]] = await Contract.update(
       { isActive: false },
       { where: { id }, returning: true }
     );
     if (row > 0) {
-      return res
-        .status(200)
-        .json({
-          ok: true,
-          contract: { ...updateContract.dataValues },
-          msg: "Eliminado correctamente",
-        });
+      return res.status(200).json({
+        ok: true,
+        contract: { ...updateContract.dataValues },
+        msg: "Eliminado correctamente",
+      });
     } else {
       return res
         .status(404)
         .json({ ok: false, msg: "No se pudo eliminar el contrato" });
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: "Error al eliminar el contrato" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 

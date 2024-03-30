@@ -13,7 +13,7 @@ const getSeasons = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el listado de temporadas",
+      msg: error.message
     });
   }
 };
@@ -25,7 +25,7 @@ const createSeason = async (req, res) => {
       .status(200)
       .json({ ok: true, newSeason, msg: "Creado correctamente" });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: "Error al crear temporada" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -45,7 +45,7 @@ const getSeason = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar la temporada" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -69,7 +69,7 @@ const updateSeason = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al actualizar la temporada" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -101,7 +101,7 @@ const deleteSeason = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al Eliminar la temporada" });
+      .json({ ok: false, msg: error.message });
   }
 };
 

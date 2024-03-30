@@ -1,9 +1,7 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
-const UserContract = require("./UserContract.js");
-
-
-const Contract = Sequelize.define('Contract', {
+const User = require('./User.js')
+const Rol = Sequelize.define('Rol', {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,
@@ -14,27 +12,20 @@ const Contract = Sequelize.define('Contract', {
     allowNull: false,
     validate: {
       notEmpty: {
-        msg: "El nombre del contrato es obligatorio."
+        msg: "El nombre del rol es obligatorio."
       },
       len: {
         args: [2, 100],
-        msg: "El nombre del contrato debe tener entre 2 y 100 caracteres.",
+        msg: "El nombre del rol debe tener entre 2 y 100 caracteres."
       },
     }
   },
   description: {
     type: DataTypes.STRING(255),
-  },
-  contract: {
-    type: DataTypes.STRING(4000),
-    allowNull: false,
     validate: {
-      notEmpty: {
-        msg: "El contrato es obligatorio."
-      },
       len: {
-        args: [1, 4000],
-        msg: "La longitud del contenido del contrato debe estar entre 1 y 4000 caracteres."
+        args: [1, 255],
+        msg: "La descripción del rol debe tener entre 1 y 255 caracteres."
       }
     }
   },
@@ -58,16 +49,15 @@ const Contract = Sequelize.define('Contract', {
   },
 });
 
-// Relación entre Contract y UserContract
-Contract.hasMany(UserContract, {
-  foreignKey: 'contractId',
+// Relación entre Rol y User
+Rol.hasMany(User, {
+  foreignKey: 'rolId',
   sourceKey: 'id',
 });
 
-UserContract.belongsTo(Contract, {
-  foreignKey: 'contractId',
+User.belongsTo(Rol, {
+  foreignKey: 'rolId',
   targetKey: 'id',
 });
 
-
-module.exports = Contract;
+module.exports = Rol;

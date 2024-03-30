@@ -1,5 +1,6 @@
 const User = require("../models/User.js");
 const sendMail = require("../config/email/emails.js");
+const bcrypt = require("bcrypt");
 
 const getUsers = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const getUsers = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el listado de usuarios",
+      msg: error.message,
     });
   }
 };
@@ -27,6 +28,8 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ ok: false, msg: "Faltan datos obligatorios." });
     }
+    // Añadir el rol por defecto como "USER"
+    req.body.rol = "USER";
     const newUser = await User.create(req.body);
     sendMail(newUser);
     return res
@@ -51,14 +54,13 @@ const getUser = async (req, res) => {
     }
     return res.status(200).json({ ok: true, user });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar el usuario" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
+  const { password } = req.body;
   try {
     const user = await User.findOne({
       where: { id },
@@ -69,6 +71,11 @@ const updateUser = async (req, res) => {
         msg: "Error con el id del usuario",
       });
     }
+    // Si se proporcionó una nueva contraseña en la solicitud, encriptarla
+    if (password) {
+      const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
+      req.body.password = hashedPassword; // Actualizar la contraseña en el cuerpo de la solicitud
+    }
     user.set(req.body);
     await user.save();
     return res.status(200).json({
@@ -78,7 +85,7 @@ const updateUser = async (req, res) => {
     });
   } catch (error) {
     console.log(error, "error");
-    return res.status(500).json({ ok: false, error: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -109,9 +116,7 @@ const deleteUser = async (req, res) => {
         .json({ ok: false, msg: "No se pudo eliminar el usuario" });
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: "Error al eliminar el usuario" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -132,9 +137,7 @@ const getUserConfirmation = async (req, res) => {
       .status(200)
       .json({ ok: true, message: "Confirmado correctamente" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: "Error al confirmar el email" });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 

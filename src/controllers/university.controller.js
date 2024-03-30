@@ -13,7 +13,7 @@ const getUniversities = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el listado de universidades",
+      msg: error.message
     });
   }
 };
@@ -27,7 +27,7 @@ const createUniversity = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al crear universidad" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -47,7 +47,7 @@ const getUniversity = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar la universidad" });
+      .json({ ok: false, msg: error.message});
   }
 };
 
@@ -71,7 +71,7 @@ const updateUniversity = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al actualizar la universidad" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
@@ -105,7 +105,7 @@ const deleteUniversity = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al eliminar la universidad" });
+      .json({ ok: false, msg: error.message });
   }
 };
 
