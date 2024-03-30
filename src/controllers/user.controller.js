@@ -7,14 +7,14 @@ const getUsers = async (req, res) => {
     if (!users) {
       return res.status(401).json({
         ok: false,
-        msg: "Error al Listar Users",
+        msg: "Error al listar usuarios",
       });
     }
-    return res.json({ ok: true, users });
+    return res.status(200).json({ ok: true, users });
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el Listado de User",
+      msg: "Ocurrio un error al cargar el listado de usuarios",
     });
   }
 };
@@ -23,9 +23,9 @@ const createUser = async (req, res) => {
   try {
     const newUser = await User.create(req.body);
     sendMail(newUser);
-    return res.json({ ok: true, newUser, msg: "Creado correctamente" });
+    return res.status(200).json({ ok: true, newUser, msg: "Creado correctamente" });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: "Error al crear User" });
+    return res.status(500).json({ ok: false, msg: "Error al crear usuario" });
   }
 };
 
@@ -38,14 +38,14 @@ const getUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id del User",
+        msg: "Error con el id del usuario",
       });
     }
     return res.status(200).json({ ok: true, user });
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar el User" });
+      .json({ ok: false, msg: "Ocurrio un error al cargar el usuario" });
   }
 };
 
@@ -58,12 +58,12 @@ const updateUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id del User",
+        msg: "Error con el id del usuario",
       });
     }
     user.set(req.body);
     await user.save();
-    return res.json({
+    return res.status(200).json({
       ok: true,
       user,
       msg: "Actualizado correctamente",
@@ -71,7 +71,7 @@ const updateUser = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al actualizar el User" });
+      .json({ ok: false, msg: "Error al actualizar el usuario" });
   }
 };
 
@@ -79,11 +79,10 @@ const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
     const _user = await User.findOne({ where: { id } });
-
     if (!_user) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id del User",
+        msg: "Error con el id del usuario",
       });
     }
 
@@ -97,7 +96,7 @@ const deleteUser = async (req, res) => {
         .json({
           ok: true,
           user: { ...updateUser.dataValues },
-          msg: "Eliminado Correctamente",
+          msg: "Eliminado correctamente",
         });
     } else {
       return res
@@ -107,7 +106,7 @@ const deleteUser = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al Eliminar el User" });
+      .json({ ok: false, msg: "Error al eliminar el usuario" });
   }
 };
 
@@ -119,7 +118,7 @@ const getUserConfirmation = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         ok: false,
-        msg: "Error en el email del Usuario",
+        msg: "Error en el email del usuario",
       });
     }
     user.isActive = true;

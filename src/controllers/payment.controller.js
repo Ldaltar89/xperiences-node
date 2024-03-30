@@ -3,18 +3,29 @@ const Payment = require("../models/Payment.js");
 const getPayments = async (req, res) => {
   try {
     const payment = await Payment.findAll();
-    return res.status(200).json(payment);
+    if (!payment) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error al listar pagos",
+      });
+    }
+    return res.status(200).json({ ok: true, payment });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({
+      ok: false,
+      msg: "Ocurrio un error al cargar el listado de pagos",
+    });
   }
 };
 
 const createPayment = async (req, res) => {
   try {
     const newPayment = await Payment.create(req.body);
-    return res.status(200).json({ msg: "Payment Realizado", newPayment });
+    return res
+      .status(200)
+      .json({ ok: true, newPayment, msg: "Creado correctamente" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ ok: false, msg: "Error al crear el pago" });
   }
 };
 
@@ -24,9 +35,17 @@ const getPayment = async (req, res) => {
     const payment = await Payment.findOne({
       where: { id },
     });
-    return res.status(200).json({ payment });
+    if (!payment) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error con el id del pago",
+      });
+    }
+    return res.status(200).json({ ok: true, payment });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res
+      .status(500)
+      .json({ ok: false, msg: "Ocurrio un error al cargar el pago" });
   }
 };
 
@@ -36,21 +55,55 @@ const updatePayment = async (req, res) => {
     const payment = await Payment.findOne({
       where: { id },
     });
+    if (!payment) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error con el id del pago",
+      });
+    }
     payment.set(req.body);
     await payment.save();
-    return res.status(200).json({ msg: "Payment Actualizado", payment });
+    return res
+      .status(200)
+      .json({ ok: true, payment, msg: "Actualizado correctamente" });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res
+      .status(500)
+      .json({ ok: false, msg: "Error al actualizar el pago" });
   }
 };
 
 const deletedPayment = async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await Payment.update({ isActive: false }, { where: { id } });
-    return res.status(200).json({ msg: "Payment Eliminado" });
+    const payment = await Payment.findOne({ where: { id } });
+    if (!payment) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error con el id del pago",
+      });
+    }
+  const [row, [updatePayment]] = await Payment.update(
+      { isActive: false },
+      { where: { id }, returning: true }
+    );
+    if (row > 0) {
+      return res
+        .status(200)
+        .json({
+          ok: true,
+          payment: { ...updatePayment.dataValues },
+          msg: "Eliminado correctamente",
+        });
+    } else {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No se pudo eliminar el pago" });
+    }
   } catch (error) {
-    return res.res.status(500).json({ message: error.message });
+    return res
+      .status(500)
+      .json({ ok: false, msg: "Error al eliminar el pago" });
   }
 };
 

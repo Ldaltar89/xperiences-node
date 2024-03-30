@@ -6,14 +6,14 @@ const getUniversities = async (req, res) => {
     if (!university) {
       return res.status(401).json({
         ok: false,
-        msg: "Error al Listar Universidades",
+        msg: "Error al listar universidades",
       });
     }
     return res.status(200).json({ ok: true, university });
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: "Ocurrio un error al cargar el Listado de Universidad",
+      msg: "Ocurrio un error al cargar el listado de universidades",
     });
   }
 };
@@ -27,7 +27,7 @@ const createUniversity = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al crear Universidad" });
+      .json({ ok: false, msg: "Error al crear universidad" });
   }
 };
 
@@ -37,18 +37,17 @@ const getUniversity = async (req, res) => {
     const university = await University.findOne({
       where: { id },
     });
-
     if (!university) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id de Universidad",
+        msg: "Error con el id de la universidad",
       });
     }
     return res.status(200).json({ ok: true, university });
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Ocurrio un error al cargar la Universidad" });
+      .json({ ok: false, msg: "Ocurrio un error al cargar la universidad" });
   }
 };
 
@@ -58,11 +57,10 @@ const updateUniversity = async (req, res) => {
     const university = await University.findOne({
       where: { id },
     });
-
     if (!university) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id del Universidad",
+        msg: "Error con el id de la universidad",
       });
     }
     university.set(req.body);
@@ -73,7 +71,7 @@ const updateUniversity = async (req, res) => {
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al actualizar el Universidad" });
+      .json({ ok: false, msg: "Error al actualizar la universidad" });
   }
 };
 
@@ -81,24 +79,33 @@ const deleteUniversity = async (req, res) => {
   const { id } = req.params;
   try {
     const university = await University.findOne({ where: { id } });
-
     if (!university) {
       return res.status(401).json({
         ok: false,
-        msg: "Error con el id de la Universidad",
+        msg: "Error con el id de la universidad",
       });
     }
-    const result = await University.update(
+  const [row, [updateUniversity]] = await University.update(
       { isActive: false },
-      { where: { id } }
+      { where: { id }, returning: true }
     );
-    return res
-      .status(200)
-      .json({ ok: true, result, msg: "Eliminado Correctamente" });
+    if (row > 0) {
+      return res
+        .status(200)
+        .json({
+          ok: true,
+          university: { ...updateUniversity.dataValues },
+          msg: "Eliminado correctamente",
+        });
+    } else {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No se pudo eliminar la universidad" });
+    }
   } catch (error) {
     return res
       .status(500)
-      .json({ ok: false, msg: "Error al Eliminar el Universidad" });
+      .json({ ok: false, msg: "Error al eliminar la universidad" });
   }
 };
 
