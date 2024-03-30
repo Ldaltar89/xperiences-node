@@ -39,12 +39,6 @@ const Payment = Sequelize.define("Payment", {
   },
   description: {
     type: DataTypes.STRING(255),
-    validate: {
-      len: {
-        args: [1, 255],
-        msg: "La longitud de la descripción debe estar entre 1 y 255 caracteres.",
-      },
-    },
   },
   total: {
     type: DataTypes.DECIMAL,
@@ -58,23 +52,15 @@ const Payment = Sequelize.define("Payment", {
   imagen: {
     type: DataTypes.STRING(255),
     allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: "La imagen es obligatoria.",
-      },
-    },
   },
   isApproved: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    type: DataTypes.STRING
   },
   isRejected: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    type: DataTypes.STRING
   },
   isCancel: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
+    type: DataTypes.STRING
   },
   isActive: {
     type: DataTypes.BOOLEAN,

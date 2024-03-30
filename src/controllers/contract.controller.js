@@ -1,15 +1,27 @@
 const Contract = require("../models/Contract.js");
+const Season = require("../models/Season.js");
 
 const getContracts = async (req, res) => {
   try {
-    const contract = await Contract.findAll();
-    if (!contract) {
+    const contracts = await Contract.findAll({
+      include: [{ model: Season, as: "Season", attributes: ["name"] }],
+      attributes: { exclude: ["seasonId"] },
+    });
+    if (!contracts) {
       return res.status(401).json({
         ok: false,
         msg: "Error al listar contratos",
       });
     }
-    return res.status(200).json({ ok: true, contract });
+
+    const modifiedContracts = contracts.map((contract) => {
+      const { Season, ...rest } = contract.toJSON();
+      return {
+        ...rest,
+        seasonId: Season ? Season.name : null,
+      };
+    });
+    return res.status(200).json({ ok: true, contracts: modifiedContracts });
   } catch (error) {
     return res.status(500).json({
       ok: false,

@@ -1,19 +1,42 @@
 const UserContract = require("../models/UserContract.js");
+const User = require("../models/User.js");
+const Contract = require("../models/Contract.js");
+const Season = require("../models/Season.js");
+const University = require("../models/University.js");
 
 const getUserContracts = async (req, res) => {
   try {
-    const userContracts = await UserContract.findAll();
+    const userContracts = await UserContract.findAll({
+      include: [
+        { model: User, as: "User", attributes: ["name"] },
+        { model: Contract, as: "Contract", attributes: ["name"] },
+        { model: Season, as: "Season", attributes: ["name"] },
+      ],
+      attributes: { exclude: ["userId", "contractId", "seasonId"] },
+    });
     if (!userContracts) {
       return res.status(401).json({
         ok: false,
         msg: "Error al listar contratos de usuario",
       });
     }
-    return res.status(200).json({ ok: true, userContracts });
+
+    const modifiedUserContracts = userContracts.map((userContract) => {
+      const { User, Contract, Season, ...rest } = userContract.toJSON();
+      return {
+        ...rest,
+        userId: User ? User.name : null,
+        contractId: Contract ? Contract.name : null,
+        seasonId: Season ? Season.name : null,
+      };
+    });
+    return res
+      .status(200)
+      .json({ ok: true, userContracts: modifiedUserContracts });
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: error.message
+      msg: error.message,
     });
   }
 };
@@ -25,9 +48,7 @@ const createUserContract = async (req, res) => {
       .status(200)
       .json({ ok: true, newUserContract, msg: "Creado correctamente" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -40,14 +61,12 @@ const getUserContract = async (req, res) => {
     if (!userContract) {
       return res.status(401).json({
         ok: false,
-        msg: error.message
+        msg: error.message,
       });
     }
     return res.status(200).json({ ok: true, userContract });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -60,7 +79,7 @@ const updateUserContract = async (req, res) => {
     if (!userContract) {
       return res.status(401).json({
         ok: false,
-        msg: error.message
+        msg: error.message,
       });
     }
     userContract.set(req.body);
@@ -69,9 +88,7 @@ const updateUserContract = async (req, res) => {
       .status(200)
       .json({ ok: true, userContract, msg: "Actualizado correctamente" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -91,22 +108,19 @@ const deleteUserContract = async (req, res) => {
       { where: { id }, returning: true }
     );
     if (row > 0) {
-      return res
-        .status(200)
-        .json({
-          ok: true,
-          userContract: { ...updateUserContract.dataValues },
-          msg: "Eliminado Correctamente",
-        });
+      return res.status(200).json({
+        ok: true,
+        userContract: { ...updateUserContract.dataValues },
+        msg: "Eliminado Correctamente",
+      });
     } else {
-      return res
-        .status(404)
-        .json({ ok: false, msg: "No se pudo eliminar el contrato del usuario" });
+      return res.status(404).json({
+        ok: false,
+        msg: "No se pudo eliminar el contrato del usuario",
+      });
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
