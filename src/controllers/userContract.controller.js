@@ -42,32 +42,41 @@ const getUserContracts = async (req, res) => {
 
 const createUserContract = async (req, res) => {
   try {
-    const newUserContract = await UserContract.create(req.body);
-    const { userId, contractId, seasonId } = req.body;
+    const { userId, contractId, seasonId, contract } = req.body;
+
     const user = await User.findOne({
       where: { id: userId },
-      attributes: ["name"],
+      attributes: ["name", "dni"],
     });
-    const contract = await Contract.findOne({
+
+    const contractData = await Contract.findOne({
       where: { id: contractId },
       attributes: ["name"],
     });
-    const season = await Season.findOne({
+
+    const seasonData = await Season.findOne({
       where: { id: seasonId },
       attributes: ["name"],
     });
+    let processedContract = contract.replace(/{name}/g, user ? user.name : '');
+    processedContract = processedContract.replace(/{dni}/g, user ? user.dni : '');
 
-    const responseContract = {
-      ...newUserContract.toJSON(),
-      userId: user ? user.name : null,
-      contractId: contract ? contract.name : null,
-      seasonId: season ? season.name : null,
-    };
-
-    return res.status(200).json({
+    const newUserContract = await UserContract.create({
+      userId,
+      contractId,
+      seasonId,
+      contract: processedContract,
+    });
+    return res.status(201).json({
       ok: true,
-      newUserContract: responseContract,
-      msg: "Creado correctamente",
+      newUserContract: {
+        ...newUserContract.toJSON(),
+        userId: user ? user.name : null,
+        contractId: contractData ? contractData.name : null,
+        seasonId: seasonData ? seasonData.name : null,
+        contract: processedContract,
+      },
+      msg: "Contrato de usuario creado correctamente",
     });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
