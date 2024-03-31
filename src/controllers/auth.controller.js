@@ -23,7 +23,9 @@ const loginUser = async (req, res) => {
       user.email,
       user.name,
       user.lastname,
-      user.rol
+      user.isClient,
+      user.isEmployed,
+      user.isAdmin
     );
 
     return res.json({
@@ -33,7 +35,9 @@ const loginUser = async (req, res) => {
       email: user.email,
       name: user.name,
       lastname: user.lastname,
-      rol: user.rol,
+      isCliente: user.isClient,
+      isEmployed: user.isEmployed,
+      isAdmin: user.isAdmin,
       token,
     });
   } catch (error) {

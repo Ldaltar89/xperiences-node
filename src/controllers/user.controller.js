@@ -48,8 +48,7 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ ok: false, msg: "Faltan datos obligatorios." });
     }
-    // Añadir el rol por defecto como "USER"
-    // req.body.rol = "USER";
+
     const newUser = await User.create(req.body);
     sendMail(newUser);
     return res
@@ -80,7 +79,7 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { password } = req.body;
+  const {isClient, isEmployed, isAdmin, password } = req.body;
   try {
     const user = await User.findOne({
       where: { id },
@@ -91,10 +90,21 @@ const updateUser = async (req, res) => {
         msg: "Error con el id del usuario",
       });
     }
-    // Si se proporcionó una nueva contraseña en la solicitud, encriptarla
-    if (password != user.password) {
+
+    if (isClient) {
+      user.isEmployed = false;
+      user.isAdmin = false;
+    } else if (isEmployed) {
+      user.isClient = false;
+      user.isAdmin = false;
+    } else if (isAdmin) {
+      user.isClient = false;
+      user.isEmployed = false;
+    }
+
+    if (password) {
       const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
-      req.body.password = hashedPassword; // Actualizar la contraseña en el cuerpo de la solicitud
+      req.body.password = hashedPassword;
     }
     user.set(req.body);
     await user.save();
