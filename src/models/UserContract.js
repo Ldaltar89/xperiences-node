@@ -12,7 +12,6 @@ const UserContract = sequelize.define("UserContract", {
   },
   contract_signed: {
     type: DataTypes.STRING(4000),
-    allowNull: false,
   },
   isActive: {
     type: DataTypes.BOOLEAN,
