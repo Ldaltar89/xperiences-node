@@ -2,7 +2,6 @@ const UserContract = require("../models/UserContract.js");
 const User = require("../models/User.js");
 const Contract = require("../models/Contract.js");
 const Season = require("../models/Season.js");
-const University = require("../models/University.js");
 
 const getUserContracts = async (req, res) => {
   try {
@@ -44,9 +43,32 @@ const getUserContracts = async (req, res) => {
 const createUserContract = async (req, res) => {
   try {
     const newUserContract = await UserContract.create(req.body);
-    return res
-      .status(200)
-      .json({ ok: true, newUserContract, msg: "Creado correctamente" });
+    const { userId, contractId, seasonId } = req.body;
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: ["name"],
+    });
+    const contract = await Contract.findOne({
+      where: { id: contractId },
+      attributes: ["name"],
+    });
+    const season = await Season.findOne({
+      where: { id: seasonId },
+      attributes: ["name"],
+    });
+
+    const responseContract = {
+      ...newUserContract.toJSON(),
+      userId: user ? user.name : null,
+      contractId: contract ? contract.name : null,
+      seasonId: season ? season.name : null,
+    };
+
+    return res.status(200).json({
+      ok: true,
+      newUserContract: responseContract,
+      msg: "Creado correctamente",
+    });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }
