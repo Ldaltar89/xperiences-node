@@ -36,11 +36,6 @@ const University = Sequelize.define("University", {
   },
   website: {
     type: DataTypes.STRING(255),
-    validate: {
-      isUrl: {
-        msg: "El sitio web de la universidad debe ser una URL válida.",
-      },
-    },
   },
   email: {
     type: DataTypes.STRING(255),

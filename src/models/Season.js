@@ -28,12 +28,6 @@ const Season = Sequelize.define("Season", {
   },
   description: {
     type: DataTypes.STRING(255),
-    validate: {
-      len: {
-        args: [1, 255],
-        msg: "La descripción de la temporada debe tener entre 1 y 255 caracteres.",
-      },
-    },
   },
   season_year: {
     type: DataTypes.STRING(5),
