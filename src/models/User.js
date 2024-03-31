@@ -103,6 +103,18 @@ const User = Sequelize.define(
         },
       },
     },
+    isClient: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    isEmployed: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
     isActive: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
