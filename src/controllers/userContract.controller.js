@@ -102,22 +102,78 @@ const getUserContract = async (req, res) => {
 };
 
 const updateUserContract = async (req, res) => {
-  const { id } = req.params;
+//   const { id } = req.params;
+//   try {
+//     const userContract = await UserContract.findOne({
+//       where: { id },
+//     });
+//     if (!userContract) {
+//       return res.status(401).json({
+//         ok: false,
+//         msg: error.message,
+//       });
+//     }
+//     userContract.set(req.body);
+//     await userContract.save();
+//     return res
+//       .status(200)
+//       .json({ ok: true, userContract, msg: "Actualizado correctamente" });
+//   } catch (error) {
+//     return res.status(500).json({ ok: false, msg: error.message });
+//   }
+// };
+const { id } = req.params;
   try {
     const userContract = await UserContract.findOne({
       where: { id },
     });
     if (!userContract) {
-      return res.status(401).json({
+      return res.status(404).json({
         ok: false,
-        msg: error.message,
+        msg: "UserContract no encontrado",
       });
     }
-    userContract.set(req.body);
+
+    const { userId, contractId, contract, contract_signed, seasonId } = req.body;
+
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: ["name", "dni"],
+    });
+
+    const contractData = await Contract.findOne({
+      where: { id: contractId },
+      attributes: ["name"],
+    });
+
+    const seasonData = await Season.findOne({
+      where: { id: seasonId },
+      attributes: ["name"],
+    });
+
+    let processedContract = contract.replace(/{name}/g, user ? user.name : '');
+    processedContract = processedContract.replace(/{dni}/g, user ? user.dni : '');
+
+    userContract.set({
+      userId,
+      contractId,
+      seasonId,
+      contract: processedContract,
+      contract_signed // incluir el contract_signed recibido en la solicitud
+    });
     await userContract.save();
-    return res
-      .status(200)
-      .json({ ok: true, userContract, msg: "Actualizado correctamente" });
+
+    return res.status(200).json({
+      ok: true,
+      userContract: {
+        ...userContract.toJSON(),
+        userId: user ? user.name : null,
+        contractId: contractData ? contractData.name : null,
+        seasonId: seasonData ? seasonData.name : null,
+        contract: processedContract,
+      },
+      msg: "UserContract actualizado correctamente",
+    });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }
