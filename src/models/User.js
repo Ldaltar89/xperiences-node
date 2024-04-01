@@ -4,7 +4,6 @@ const bcrypt = require("bcrypt");
 const Payment = require("./Payment.js");
 const UserContract = require("./UserContract.js");
 
-
 const User = Sequelize.define(
   "User",
   {
@@ -103,17 +102,8 @@ const User = Sequelize.define(
         },
       },
     },
-    isClient: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-    },
-    isEmployed: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
-    isAdmin: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
+    rol: {
+      type: DataTypes.STRING,
     },
     isActive: {
       type: DataTypes.BOOLEAN,
