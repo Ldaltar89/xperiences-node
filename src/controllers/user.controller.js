@@ -91,17 +91,6 @@ const updateUser = async (req, res) => {
       });
     }
 
-    if (isClient) {
-      user.isEmployed = false;
-      user.isAdmin = false;
-    } else if (isEmployed) {
-      user.isClient = false;
-      user.isAdmin = false;
-    } else if (isAdmin) {
-      user.isClient = false;
-      user.isEmployed = false;
-    }
-
     if (password) {
       const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
       req.body.password = hashedPassword;

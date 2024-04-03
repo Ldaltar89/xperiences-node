@@ -8,7 +8,6 @@ const UserContract = sequelize.define("UserContract", {
   },
   contract: {
     type: DataTypes.STRING(4000),
-    allowNull: false,
   },
   contract_signed: {
     type: DataTypes.STRING(4000),

@@ -6,9 +6,7 @@ const generarJWY = async (
   email,
   name,
   lastname,
-  isClient,
-  isEmployed,
-  isAdmin
+  rol
 ) => {
   return new Promise((resolve, reject) => {
     const payload = {
@@ -16,9 +14,7 @@ const generarJWY = async (
       email,
       name,
       lastname,
-      isClient,
-      isEmployed,
-      isAdmin,
+      rol
     };
     jwt.sign(
       payload,

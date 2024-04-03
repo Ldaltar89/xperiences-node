@@ -19,6 +19,7 @@ app.use("/api/examType", require("./routes/examType.js"));
 app.use("/api/exam", require("./routes/exam.js"));
 app.use("/api/question", require("./routes/question.js"));
 app.use("/api/userContract", require("./routes/userContract.js"));
+// app.use("/api/pdfContract", require("./routes/pdfContract.js"));
 
 
 // export default app;
