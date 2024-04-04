@@ -12,6 +12,9 @@ const UserContract = sequelize.define("UserContract", {
   contract_signed: {
     type: DataTypes.STRING(4000),
   },
+  seasonId: {
+    type: DataTypes.STRING(255),
+  },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,

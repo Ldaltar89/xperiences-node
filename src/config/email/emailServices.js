@@ -92,4 +92,42 @@ const sendMail = async (user) => {
   return;
 };
 
-module.exports = sendMail;
+const sendUserContractEmail = async (user, contractBuffer) => {
+
+  console.log(user,"user");
+  const transport = createTrans();
+   const htmlTemplate = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Contrato generado para el usuario ${user.name}</title>
+    </head>
+    <body>
+      <p>Su contrato ha sido generado correctamente.</p>
+      <p>Adjunto encontrará el contrato generado para usted.</p>
+    </body>
+    </html>
+  `;
+
+  const mailOptions = {
+    from: "xperiences@gmail.com",
+    to: `${user.email}`,
+    cc: "manager@example.com",
+    subject: `Contrato generado para el usuario ${user.name}`, // Asunto del correo electrónico
+    html: htmlTemplate,
+    attachments: [
+      {
+        filename: `${user.name}_${user.lastname}_${user.dni}.pdf`, // Nombre personalizado del archivo PDF
+        content: contractBuffer, // Contenido del archivo adjunto (PDF)
+        contentType: "application/pdf", // Tipo de contenido del archivo adjunto
+      },
+    ],
+  };
+
+  // Enviar el correo electrónico
+  await transport.sendMail(mailOptions);
+};
+
+module.exports = { sendMail, sendUserContractEmail };

@@ -77,46 +77,46 @@ User.belongsTo(Season, {
 });
 
 // Relación entre Season y Contract
-Season.hasMany(Contract, {
-  foreignKey: 'seasonId',
-  sourceKey: 'id',
-});
+// Season.hasMany(Contract, {
+//   foreignKey: 'seasonId',
+//   sourceKey: 'id',
+// });
 
-Contract.belongsTo(Season, {
-  foreignKey: 'seasonId',
-  targetKey: 'id',
-});
+// Contract.belongsTo(Season, {
+//   foreignKey: 'seasonId',
+//   targetKey: 'id',
+// });
 
 // Relación entre Season y UserContract
-Season.hasMany(UserContract, {
-  foreignKey: 'seasonId',
-  sourceKey: 'id',
-});
+// Season.hasMany(UserContract, {
+//   foreignKey: 'seasonId',
+//   sourceKey: 'id',
+// });
 
-UserContract.belongsTo(Season, {
-  foreignKey: 'seasonId',
-  targetKey: 'id',
-});
+// UserContract.belongsTo(Season, {
+//   foreignKey: 'seasonId',
+//   targetKey: 'id',
+// });
 
 // Relación entre Season y Payment
-Season.hasMany(Payment, {
-  foreignKey: 'seasonId',
-  sourceKey: 'id',
-});
+// Season.hasMany(Payment, {
+//   foreignKey: 'seasonId',
+//   sourceKey: 'id',
+// });
 
-Payment.belongsTo(Season, {
-  foreignKey: 'seasonId',
-  targetKey: 'id',
-});
+// Payment.belongsTo(Season, {
+//   foreignKey: 'seasonId',
+//   targetKey: 'id',
+// });
 
 // Relación entre Season y Exam
-Season.hasMany(Exam, {
-  foreignKey: 'seasonId',
-  sourceKey: 'id',
-});
+// Season.hasMany(Exam, {
+//   foreignKey: 'seasonId',
+//   sourceKey: 'id',
+// });
 
-Exam.belongsTo(Season, {
-  foreignKey: 'seasonId',
-  targetKey: 'id',
-});
+// Exam.belongsTo(Season, {
+//   foreignKey: 'seasonId',
+//   targetKey: 'id',
+// });
 module.exports = Season;

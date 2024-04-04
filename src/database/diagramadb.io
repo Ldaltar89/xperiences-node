@@ -1,4 +1,3 @@
-// Docs: https://dbml.dbdiagram.io
 
 Table seasons {
   id uuid [primary key]
@@ -39,6 +38,9 @@ Table user {
   birthday datetime
   user_image varchar(255)
   gender varchar(20)
+  isClient boolean
+  isEmployed boolean
+  isAdmin boolean
   university_id uuid
   season_id uuid
   isActive boolean
@@ -48,9 +50,20 @@ Table user {
   updatedBy varchar(100)
 }
 
-Ref: user.university_id > university.id
+Table rol {
+  id uuid [primary key]
+  name varchar(100)
+  description varchar(255)
+  isActive boolean
+  createdAt datetime
+  createdBy varchar(100)
+  updatedAt datetime
+  updateddBy varchar(100)
+}
 
+Ref: user.university_id > university.id
 Ref: user.season_id > seasons.id
+
 
 // Name: ExamnsType
 Table examns_type {
@@ -80,7 +93,7 @@ Table examns {
   updatedBy varchar(100) // [yes] nullable
 }
 
-Ref: examns.season_id  > seasons.id
+// Ref: examns.season_id  > seasons.id
 Ref: examns.examn_type_id > examns_type.id
 
 // Name: Questions
@@ -128,6 +141,7 @@ Table user_examns {
   id Uuid [primary key]
   isDone bool // [no] nullable
   isApproved bool // [no] nullable
+  isdesaprobado bool // [no] nullable
   isCanceled bool // [no] nullable
   score decimal // [no] nullable 5 number, 2 decimal
   examn_id Uuid
@@ -142,7 +156,7 @@ Table user_examns {
 
 Ref: user_examns.examn_id > examns.id
 Ref: user_examns.user_id > user.id
-Ref: user_examns.season_id > seasons.id
+// Ref: user_examns.season_id > seasons.id
 
 // Name: UserQuestions
 Table user_questions {
@@ -193,12 +207,12 @@ Table contract {
   updateddBy varchar(100)
 }
 
-Ref: contract.season_id > seasons.id
+// Ref: contract.season_id > seasons.id
 Ref: Payments.user_id > user.id
-Ref: Payments.season_id > seasons.id
+// Ref: Payments.season_id > seasons.id
 Ref: user_contract.user_id > user.id
 Ref: user_contract.contract_id > contract.id
-Ref: user_contract.season_id > seasons.id
+// Ref: user_contract.season_id > seasons.id
 
 Table Payments {
   id uuid [primary key]

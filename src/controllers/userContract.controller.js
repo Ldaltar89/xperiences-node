@@ -1,9 +1,9 @@
 const UserContract = require("../models/UserContract.js");
 const User = require("../models/User.js");
 const Contract = require("../models/Contract.js");
-const Season = require("../models/Season.js");
-const puppeteer = require("puppeteer");
-const fs = require("fs");
+// const Season = require("../models/Season.js");
+const { sendUserContractEmail } = require("../config/email/emailServices.js");
+const { generatePDF } = require("../config/pdf/pdfServices.js");
 const path = require("path");
 
 const getUserContracts = async (req, res) => {
@@ -12,7 +12,6 @@ const getUserContracts = async (req, res) => {
       include: [
         { model: User, as: "User", attributes: ["name"] },
         { model: Contract, as: "Contract", attributes: ["name"] },
-        { model: Season, as: "Season", attributes: ["name"] },
       ],
       attributes: { exclude: ["userId", "contractId", "seasonId"] },
     });
@@ -29,7 +28,6 @@ const getUserContracts = async (req, res) => {
         ...rest,
         userId: User ? User.name : null,
         contractId: Contract ? Contract.name : null,
-        seasonId: Season ? Season.name : null,
       };
     });
     return res
@@ -43,50 +41,55 @@ const getUserContracts = async (req, res) => {
   }
 };
 
+// const pdfDir = path.join(__dirname, "pdfs");
+//   if (!fs.existsSync(pdfDir)) {
+//     fs.mkdirSync(pdfDir);
+//   }
+
 const createUserContract = async (req, res) => {
-    try {
-      const { userId, contractId, seasonId, contract, contract_signed } = req.body;
-      const user = await User.findOne({
-        where: { id: userId },
-        attributes: ["name", "dni"],
-      });
+  //   try {
+  //     const { userId, contractId, seasonId, contract, contract_signed } = req.body;
+  //     const user = await User.findOne({
+  //       where: { id: userId },
+  //       attributes: ["name", "dni"],
+  //     });
 
-      const contractData = await Contract.findOne({
-        where: { id: contractId },
-        attributes: ["name"],
-      });
+  //     const contractData = await Contract.findOne({
+  //       where: { id: contractId },
+  //       attributes: ["name"],
+  //     });
 
-      const seasonData = await Season.findOne({
-        where: { id: seasonId },
-        attributes: ["name"],
-      });
-      let processedContract = contract.replace(/{name}/g, user ? user.name : '');
-      processedContract = processedContract.replace(/{dni}/g, user ? user.dni : '');
+  //     const seasonData = await Season.findOne({
+  //       where: { id: seasonId },
+  //       attributes: ["name"],
+  //     });
+  //     let processedContract = contract.replace(/{name}/g, user ? user.name : '');
+  //     processedContract = processedContract.replace(/{dni}/g, user ? user.dni : '');
 
-      const newUserContract = await UserContract.create({
-        userId,
-        contractId,
-        seasonId,
-        contract: processedContract,
-      });
-      console.log(newUserContract);
-      return res.status(201).json({
-        ok: true,
-        newUserContract: {
-          ...newUserContract.toJSON(),
-          userId: user ? user.name : null,
-          contractId: contractData ? contractData.name : null,
-          seasonId: seasonData ? seasonData.name : null,
-          contract: processedContract,
-          contract_signed
-        },
-        msg: "Contrato de usuario creado correctamente",
-      });
-    } catch (error) {
-      return res.status(500).json({ ok: false, msg: error.message });
-    }
-  };
-//-------------
+  //     const newUserContract = await UserContract.create({
+  //       userId,
+  //       contractId,
+  //       seasonId,
+  //       contract: processedContract,
+  //     });
+  //     console.log(newUserContract);
+  //     return res.status(201).json({
+  //       ok: true,
+  //       newUserContract: {
+  //         ...newUserContract.toJSON(),
+  //         userId: user ? user.name : null,
+  //         contractId: contractData ? contractData.name : null,
+  //         seasonId: seasonData ? seasonData.name : null,
+  //         contract: processedContract,
+  //         contract_signed
+  //       },
+  //       msg: "Contrato de usuario creado correctamente",
+  //     });
+  //   } catch (error) {
+  //     return res.status(500).json({ ok: false, msg: error.message });
+  //   }
+  // };
+  //-------------
   //   try {
   //     const { userId, contractId, seasonId, contract } = req.body;
 
@@ -123,7 +126,6 @@ const createUserContract = async (req, res) => {
   //         ...newUserContract.toJSON(),
   //         userId: user ? user.name : null,
   //         contractId: contractData ? contractData.name : null,
-  //         seasonId: seasonData ? seasonData.name : null,
   //         contract: pdfPath, // Devolver la ruta del PDF
   //       },
   //       msg: "Contrato de usuario creado correctamente",
@@ -153,81 +155,60 @@ const createUserContract = async (req, res) => {
 
   //   return pdfPath;
   // }
-//-----------
+  //---------------------------------------------------------------------
   // Ruta donde se guardarán los PDFs
-//   const pdfDir = path.join(__dirname, "pdfs");
-//   if (!fs.existsSync(pdfDir)) {
-//     fs.mkdirSync(pdfDir);
-//   }
+  //
+  //---------------------------------------------------------------------------------------------------------------------------------------
+  try {
+    const { userId, contractId, contract } = req.body;
 
-//   const createUserContract = async (req, res) => {
-//     try {
-//       const { userId, contractId, seasonId, contract } = req.body;
+    // Obtener datos de usuario desde la base de datos
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: ["name", "dni", "lastname", "email"],
+    });
 
-//       // Obtener datos de usuario, contrato y temporada desde la base de datos
-//       const user = await User.findOne({
-//         where: { id: userId },
-//         attributes: ["name", "dni"],
-//       });
+    // Obtener datos del contrato desde la base de datos
+    const contractData = await Contract.findOne({
+      where: { id: contractId },
+      attributes: ["name"],
+    });
 
-//       const contractData = await Contract.findOne({
-//         where: { id: contractId },
-//         attributes: ["name"],
-//       });
+    // Reemplazar variables en el contrato HTML
+    const processedContract = contract
+      .replace(/{name}/g, user ? user.name : "")
+      .replace(/{dni}/g, user ? user.dni : "");
 
-//       const seasonData = await Season.findOne({
-//         where: { id: seasonId },
-//         attributes: ["name"],
-//       });
+    // Generar PDF a partir del contenido HTML del contrato con datos de usuario reemplazados
+    const pdfPath = await generatePDF(processedContract);
 
-//       // Generar PDF a partir del contenido HTML del contrato con datos de usuario reemplazados
-//       const pdfPath = await generatePDF(user, contract);
+    // Obtener solo el nombre del archivo PDF
+    // const pdfName = path.basename(pdfPath.toString());
 
-//       // Guardar la ruta del PDF en la base de datos
-//       const newUserContract = await UserContract.create({
-//         userId,
-//         contractId,
-//         seasonId,
-//         contract: pdfPath, // Guardar la ruta del PDF en lugar del contenido HTML
-//       });
+    // Guardar la ruta del PDF en la base de datos
+    const newUserContract = await UserContract.create({
+      userId,
+      contractId,
+      contract: processedContract,
+    });
 
-//       return res.status(201).json({
-//         ok: true,
-//         newUserContract: {
-//           ...newUserContract.toJSON(),
-//           userId: user ? user.name : null,
-//           contractId: contractData ? contractData.name : null,
-//           seasonId: seasonData ? seasonData.name : null,
-//           contract: pdfPath, // Devolver la ruta del PDF
-//         },
-//         msg: "Contrato de usuario creado correctamente",
-//       });
-//     } catch (error) {
-//       return res.status(500).json({ ok: false, msg: error.message });
-//     }
-//   };
+    // Enviar el contrato por correo electrónico
+    await sendUserContractEmail(user, pdfPath);
 
-//   // Función para generar PDF con Puppeteer
-//   async function generatePDF(user, contractHTML) {
-//     const browser = await puppeteer.launch();
-//     const page = await browser.newPage();
-
-//     // Reemplazar datos del usuario en el contrato HTML
-//     const processedContract = contractHTML
-//       .replace(/{name}/g, user ? user.name : "")
-//       .replace(/{dni}/g, user ? user.dni : "");
-
-//     await page.setContent(processedContract);
-
-//     // Generar PDF
-//     const pdfName = `contract_${user.name}_${user.dni}_${Date.now()}.pdf`;
-//     const pdfPath = path.join(pdfDir, pdfName);
-//     await page.pdf({ path: pdfPath, format: "A4" });
-
-//     await browser.close();
-
-//     return pdfPath;
-//   };
+    return res.status(201).json({
+      ok: true,
+      newUserContract: {
+        ...newUserContract.toJSON(),
+        userId: user ? user.name : null,
+        contractId: contractData ? contractData.name : null,
+        contract: processedContract,
+      },
+      msg: "Contrato de usuario creado correctamente",
+    });
+  } catch (error) {
+    return res.status(500).json({ ok: false, msg: error.message });
+  }
+};
 const getUserContract = async (req, res) => {
   const { id } = req.params;
   try {
@@ -292,11 +273,6 @@ const updateUserContract = async (req, res) => {
       attributes: ["name"],
     });
 
-    const seasonData = await Season.findOne({
-      where: { id: seasonId },
-      attributes: ["name"],
-    });
-
     let processedContract = contract.replace(/{name}/g, user ? user.name : "");
     processedContract = processedContract.replace(
       /{dni}/g,
@@ -306,7 +282,6 @@ const updateUserContract = async (req, res) => {
     userContract.set({
       userId,
       contractId,
-      seasonId,
       contract: processedContract,
       contract_signed, // incluir el contract_signed recibido en la solicitud
     });
@@ -318,7 +293,6 @@ const updateUserContract = async (req, res) => {
         ...userContract.toJSON(),
         userId: user ? user.name : null,
         contractId: contractData ? contractData.name : null,
-        seasonId: seasonData ? seasonData.name : null,
         contract: processedContract,
       },
       msg: "UserContract actualizado correctamente",

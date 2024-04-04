@@ -2,25 +2,24 @@ const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
 const UserContract = require("./UserContract.js");
 
-
-const Contract = Sequelize.define('Contract', {
+const Contract = Sequelize.define("Contract", {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,
-    defaultValue: DataTypes.UUIDV4
+    defaultValue: DataTypes.UUIDV4,
   },
   name: {
     type: DataTypes.STRING(100),
     allowNull: false,
     validate: {
       notEmpty: {
-        msg: "El nombre del contrato es obligatorio."
+        msg: "El nombre del contrato es obligatorio.",
       },
       len: {
         args: [2, 100],
         msg: "El nombre del contrato debe tener entre 2 y 100 caracteres.",
       },
-    }
+    },
   },
   description: {
     type: DataTypes.STRING(255),
@@ -30,13 +29,16 @@ const Contract = Sequelize.define('Contract', {
     allowNull: false,
     validate: {
       notEmpty: {
-        msg: "El contrato es obligatorio."
+        msg: "El contrato es obligatorio.",
       },
       len: {
         args: [1, 4000],
-        msg: "La longitud del contenido del contrato debe estar entre 1 y 4000 caracteres."
-      }
-    }
+        msg: "La longitud del contenido del contrato debe estar entre 1 y 4000 caracteres.",
+      },
+    },
+  },
+  seasonId: {
+    type: DataTypes.STRING(255),
   },
   isActive: {
     type: DataTypes.BOOLEAN,
@@ -60,14 +62,13 @@ const Contract = Sequelize.define('Contract', {
 
 // Relación entre Contract y UserContract
 Contract.hasMany(UserContract, {
-  foreignKey: 'contractId',
-  sourceKey: 'id',
+  foreignKey: "contractId",
+  sourceKey: "id",
 });
 
 UserContract.belongsTo(Contract, {
-  foreignKey: 'contractId',
-  targetKey: 'id',
+  foreignKey: "contractId",
+  targetKey: "id",
 });
-
 
 module.exports = Contract;
