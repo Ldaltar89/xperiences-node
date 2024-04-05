@@ -6,11 +6,11 @@ const Sequelize = require("./database/database.js");
 // const University = require("./models/University.js");
 // const Season = require("./models/Season.js");
 // const Contract = require("./models/Contract.js");
+// const UserContract = require("./models/UserContract.js");
 // const ExamType = require("./models/ExamType.js");
 // const Exam = require("./models/Exam.js");
-// const Question = require("./models/Question.js");
-// const UserContract = require("./models/UserContract.js");
 
+// const Question = require("./models/Question.js");
 async function main() {
   try {
     await Sequelize.sync({ force: false });

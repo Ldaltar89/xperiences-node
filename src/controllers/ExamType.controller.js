@@ -3,19 +3,24 @@ const ExamType = require("../models/ExamType.js");
 const getExamTypes = async (req, res) => {
   try {
     const examType = await ExamType.findAll();
-    return res.status(200).json({ examType });
+    if (!examType) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error al listar ExamType",
+      });
+    }
+    return res.status(200).json({ ok: true, examType });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
 const createExamType = async (req, res) => {
-  const { name } = req.body;
   try {
-    const newExamType = await ExamType.create({
-      name,
-    });
-    return res.status(200).json({ msg: "ExamType Creado", newExamType });
+    const newExamType = await ExamType.create(req.body);
+    return res
+      .status(200)
+      .json({ ok: true, newExamType, msg: "Creado correctamente" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -27,9 +32,15 @@ const getExamType = async (req, res) => {
     const examType = await ExamType.findOne({
       where: { id },
     });
+    if (!examType) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error con el id del ExamType",
+      });
+    }
     return res.status(200).json({ ok: true, examType });
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -39,9 +50,17 @@ const updateExamType = async (req, res) => {
     const examType = await ExamType.findOne({
       where: { id },
     });
+    if (!examType) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error con el id del ExamType",
+      });
+    }
     examType.set(req.body);
     await examType.save();
-    return res.status(200).json({ ok: true, examType });
+    return res
+      .status(200)
+      .json({ ok: true, examType, msg: "Actualizado correctamente" });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -50,13 +69,30 @@ const updateExamType = async (req, res) => {
 const deleteExamType = async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await ExamType.update(
+    const examType = await ExamType.findOne({ where: { id } });
+    if (!examType) {
+      return res.status(401).json({
+        ok: false,
+        msg: "Error con el id del ExamType",
+      });
+    }
+    const [row, [updateExamType]] = await ExamType.update(
       { isActive: false },
-      { where: { id } }
+      { where: { id }, returning: true }
     );
-    return res.status(200).json({ ok: "ExamType deleted" });
+    if (row > 0) {
+      return res.status(200).json({
+        ok: true,
+        examType: { ...updateExamType.dataValues },
+        msg: "Eliminado correctamente",
+      });
+    } else {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No se pudo eliminar el Typo de Examen" });
+    }
   } catch (error) {
-    return res.status(500).json({ message: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 

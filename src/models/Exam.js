@@ -68,4 +68,6 @@ const Exam = Sequelize.define("Exam", {
   },
 });
 
+
+
 module.exports = Exam;

@@ -1,7 +1,7 @@
 const User = require("../models/User.js");
 const University = require("../models/University.js");
 const Season = require("../models/Season.js");
-const sendMail = require("../config/email/emailServices.js");
+const {sendMail} = require("../config/email/emailServices.js");
 const bcrypt = require("bcrypt");
 
 const getUsers = async (req, res) => {
