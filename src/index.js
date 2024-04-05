@@ -9,6 +9,7 @@ const Sequelize = require("./database/database.js");
 // const UserContract = require("./models/UserContract.js");
 // const ExamType = require("./models/ExamType.js");
 // const Exam = require("./models/Exam.js");
+// const UserExam = require("./models/UserExam.js");
 
 // const Question = require("./models/Question.js");
 async function main() {

@@ -144,7 +144,7 @@ const updateUserContract = async (req, res) => {
       });
     }
 
-    const { userId, contractId, contract, contract_signed, seasonId } =
+    const { userId, contractId, contract, contract_signed} =
       req.body;
 
     const user = await User.findOne({

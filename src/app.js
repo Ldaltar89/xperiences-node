@@ -18,6 +18,9 @@ app.use("/api/payment", require("./routes/payment.js"));
 app.use("/api/examType", require("./routes/examType.js"));
 app.use("/api/exam", require("./routes/exam.js"));
 app.use("/api/userContract", require("./routes/userContract.js"));
+app.use("/api/userExam", require("./routes/userExam.js"));
+
+
 // app.use("/api/question", require("./routes/question.js"));
 
 

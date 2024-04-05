@@ -6,10 +6,8 @@ const getPayments = async (req, res) => {
   try {
     const payments = await Payment.findAll({
       include: [
-        { model: User, as: "User", attributes: ["name"] },
-        { model: Season, as: "Season", attributes: ["name"] },
-      ],
-      attributes: { exclude: ["userId", "seasonId"] },
+        { model: User, as: "User", attributes: ["name"] }],
+      attributes: { exclude: ["userId"] },
     });
     if (!payments) {
       return res.status(401).json({
