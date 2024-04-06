@@ -13,16 +13,12 @@ const validarJWT = (req, res = response, next) => {
     });
   }
   try {
-    const { id, email, name, lastname, rol } = jwt.verify(
+    const { id } = jwt.verify(
       token,
       process.env.SECRET_JWT_SEED
     );
 
     req.id = id;
-    req.email = email;
-    req.name = name;
-    req.lastname = lastname;
-    req.rol = rol;
   } catch (error) {
     return res.status(401).json({
       ok: false,

@@ -1,30 +1,20 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const generarJWY = async (
-  id,
-  email,
-  name,
-  lastname,
-  rol
-) => {
+const generarJWY = async (id, time) => {
   return new Promise((resolve, reject) => {
     const payload = {
       id,
-      email,
-      name,
-      lastname,
-      rol
     };
+    const expiresIn = time
     jwt.sign(
       payload,
       process.env.SECRET_JWT_SEED,
       {
-        expiresIn: "24h",
+        expiresIn
       },
       (err, token) => {
         if (err) {
-          console.log(err);
           reject("No se pudo generar el token");
         }
         resolve(token);

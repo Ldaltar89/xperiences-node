@@ -1,6 +1,7 @@
 const UserExam = require("../models/UserExam.js");
 const Exam = require("../models/Exam.js");
 const User = require("../models/User.js");
+const { where } = require("sequelize");
 
 const getUserExams = async (req, res) => {
   try {
@@ -37,10 +38,42 @@ const getUserExams = async (req, res) => {
 
 const createUserExam = async (req, res) => {
   try {
-    const newUserExam = await UserExam.create(req.body);
-    return res
-      .status(200)
-      .json({ ok: true, newUserExam, msg: "Creado correctamente" });
+    const { userId, examId, ...userExamData } = req.body;
+
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: ["name"],
+    });
+
+    if(!user){
+      return res.status(401).json({
+        ok:false,
+        msg:"Error en el id del User"
+      })
+    }
+
+    const exam = await Exam.findOne({
+      where: { id: examId },
+      attributes: ["name"],
+    });
+
+    if(!exam){
+      return res.status(401).json({
+        ok:false,
+        msg:"Error en el id del Exam"
+      })
+    }
+
+    const newUserExam = await UserExam.create({ userId, examId, ...userExamData });
+    return res.status(200).json({
+      ok: true,
+      newUserExam: {
+        ...newUserExam.toJSON(),
+        userId: user ? user.name : null,
+        examId: exam ? exam.name : null,
+      },
+      msg: "Creado correctamente",
+    });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }

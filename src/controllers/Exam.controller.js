@@ -1,3 +1,4 @@
+const { where } = require("sequelize");
 const Exam = require("../models/Exam.js");
 const ExamType = require("../models/ExamType.js");
 
@@ -32,10 +33,29 @@ const getExams = async (req, res) => {
 
 const createExam = async (req, res) => {
   try {
-    const newExam = await Exam.create(req.body);
-    return res
-      .status(200)
-      .json({ ok: true, newExam, msg: "Creado correctamente" });
+    const { examTypeId, ...examData } = req.body;
+
+    const examType = await ExamType.findOne({
+      where: { id: examTypeId },
+      attributes: ["name"],
+    });
+
+    if(!examType){
+      return res.status(401).json({ok:false, msg:"Error en el id del examType"})
+    }
+
+    const newExam = await Exam.create({
+      examTypeId,
+      ...examData
+    });
+    return res.status(200).json({
+      ok: true,
+      newExam: {
+        ...newExam.toJSON(),
+        examTypeId: examType ? examType.name : null,
+      },
+      msg: "Creado correctamente",
+    });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }

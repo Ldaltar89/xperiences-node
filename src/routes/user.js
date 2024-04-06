@@ -17,6 +17,6 @@ router.patch("/:id", validarJWT,deleteUser);
 router.get("/:id", validarJWT,getUser);
 
 //Confirmar cuenta
-router.get("/verification/:email", getUserConfirmation);
+router.get("/verification/:token", getUserConfirmation);
 
 module.exports = router;

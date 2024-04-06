@@ -3,6 +3,8 @@ const University = require("../models/University.js");
 const Season = require("../models/Season.js");
 const {sendMail} = require("../config/email/emailServices.js");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const generarJWY = require("../helpers/jwt.js");
 
 const getUsers = async (req, res) => {
   try {
@@ -48,9 +50,13 @@ const createUser = async (req, res) => {
         .status(400)
         .json({ ok: false, msg: "Faltan datos obligatorios." });
     }
-
     const newUser = await User.create(req.body);
-    sendMail(newUser);
+    const token = await generarJWY(
+      newUser.id,
+      "24h"
+    );
+
+    sendMail( newUser,token);
     return res
       .status(200)
       .json({ ok: true, newUser, msg: "Creado correctamente" });
@@ -79,7 +85,7 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const {isClient, isEmployed, isAdmin, password } = req.body;
+  const { password } = req.body;
   try {
     const user = await User.findOne({
       where: { id },
@@ -103,7 +109,6 @@ const updateUser = async (req, res) => {
       msg: "Actualizado correctamente",
     });
   } catch (error) {
-    console.log(error, "error");
     return res.status(500).json({ ok: false, msg: error.message });
   }
 };
@@ -141,9 +146,13 @@ const deleteUser = async (req, res) => {
 
 //Confirmar cuenta
 const getUserConfirmation = async (req, res) => {
-  const { email } = req.params;
+  const { token } = req.params;
   try {
-    const user = await User.findOne({ where: { email } });
+    const { id } = jwt.decode(
+      token,
+      process.env.SECRET_JWT_SEED
+    );
+    const user = await User.findOne({ where: { id } });
     if (!user) {
       return res.status(401).json({
         ok: false,
@@ -159,6 +168,10 @@ const getUserConfirmation = async (req, res) => {
     return res.status(500).json({ ok: false, msg: error.message });
   }
 };
+
+const getOlvidarPassword = async (req, res) => {
+
+}
 
 module.exports = {
   createUser,

@@ -1,3 +1,4 @@
+const { token } = require("morgan");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
@@ -14,7 +15,7 @@ const createTrans = () => {
   return transport;
 };
 
-const sendMail = async (user) => {
+const sendMail = async (user, token) => {
   const transport = createTrans();
   const htmlTemplate = `<!DOCTYPE html>
 <html lang="en">
@@ -67,7 +68,7 @@ const sendMail = async (user) => {
     <h1>Por favor, confirma tu dirección de correo electrónico</h1>
     <p>Gracias por unirte a Brandindoor. Para completar el registro, por favor confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:</p>
     <div style="text-align: center;">
-      <a href="http://localhost:4000/api/user/verification/${user.email}" class="button">Confirmar dirección de correo electrónico</a>
+      <a href="http://localhost:4000/api/user/verification/${token}" class="button">Confirmar dirección de correo electrónico</a>
     </div>
     <p>Si tienes algún problema al hacer clic en el botón de arriba, copia y pega el siguiente enlace en tu navegador:</p>
     <p>xperiences@info.com</p>
@@ -93,8 +94,6 @@ const sendMail = async (user) => {
 };
 
 const sendUserContractEmail = async (user, contractBuffer) => {
-
-  console.log(user,"user");
   const transport = createTrans();
    const htmlTemplate = `
     <!DOCTYPE html>
