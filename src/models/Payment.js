@@ -36,6 +36,9 @@ const Payment = Sequelize.define("Payment", {
         msg: "La longitud de la referencia debe estar entre 1 y 255 caracteres.",
       },
     },
+  }, 
+  concept:{
+    type:DataTypes.STRING(20)
   },
   description: {
     type: DataTypes.STRING(255),

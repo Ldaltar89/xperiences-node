@@ -23,12 +23,6 @@ const ExamType = Sequelize.define('ExamType', {
   },
   description: {
     type: DataTypes.STRING(255),
-    validate: {
-        len: {
-          args: [1, 255],
-          msg: 'La descripción debe tener como máximo 255 caracteres.',
-        },
-      },
   },
   isActive: {
     type: DataTypes.BOOLEAN,

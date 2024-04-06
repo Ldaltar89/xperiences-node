@@ -12,7 +12,6 @@ const UserExam = Sequelize.define("User_examns", {
   },
   isDone: {
     type: DataTypes.BOOLEAN,
-    allowNull: false,
   },
   isApproved: {
     type: DataTypes.BOOLEAN,
@@ -25,11 +24,6 @@ const UserExam = Sequelize.define("User_examns", {
   },
   score: {
     type: DataTypes.DECIMAL(5, 2),
-    allowNull: false,
-    validate: {
-      min: 0,
-      max: 20,
-    },
   },
   season_id: {
     type: DataTypes.STRING(255),
