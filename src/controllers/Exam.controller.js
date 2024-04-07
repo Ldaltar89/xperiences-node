@@ -40,13 +40,15 @@ const createExam = async (req, res) => {
       attributes: ["name"],
     });
 
-    if(!examType){
-      return res.status(401).json({ok:false, msg:"Error en el id del examType"})
+    if (!examType) {
+      return res
+        .status(401)
+        .json({ ok: false, msg: "Error en el id del examType" });
     }
 
     const newExam = await Exam.create({
       examTypeId,
-      ...examData
+      ...examData,
     });
     return res.status(200).json({
       ok: true,

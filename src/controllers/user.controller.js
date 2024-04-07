@@ -1,9 +1,8 @@
 const User = require("../models/User.js");
 const University = require("../models/University.js");
 const Season = require("../models/Season.js");
-const {sendMail} = require("../config/email/emailServices.js");
+const { sendMail } = require("../config/email/emailServices.js");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const generarJWY = require("../helpers/jwt.js");
 
 const getUsers = async (req, res) => {
@@ -24,7 +23,7 @@ const getUsers = async (req, res) => {
       });
     }
 
-    const modifiedUsers = users.map(user => {
+    const modifiedUsers = users.map((user) => {
       const { University, Season, ...rest } = user.toJSON();
       return {
         ...rest,
@@ -32,7 +31,7 @@ const getUsers = async (req, res) => {
         seasonId: Season ? Season.name : null,
       };
     });
-  
+
     return res.status(200).json({ ok: true, users: modifiedUsers });
   } catch (error) {
     return res.status(500).json({
@@ -51,12 +50,9 @@ const createUser = async (req, res) => {
         .json({ ok: false, msg: "Faltan datos obligatorios." });
     }
     const newUser = await User.create(req.body);
-    const token = await generarJWY(
-      newUser.id,
-      "24h"
-    );
+    const token = await generarJWY(newUser.id, "1m");
 
-    sendMail( newUser,token);
+    sendMail(newUser, token);
     return res
       .status(200)
       .json({ ok: true, newUser, msg: "Creado correctamente" });
@@ -144,40 +140,10 @@ const deleteUser = async (req, res) => {
   }
 };
 
-//Confirmar cuenta
-const getUserConfirmation = async (req, res) => {
-  const { token } = req.params;
-  try {
-    const { id } = jwt.decode(
-      token,
-      process.env.SECRET_JWT_SEED
-    );
-    const user = await User.findOne({ where: { id } });
-    if (!user) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Error en el email del usuario",
-      });
-    }
-    user.isActive = true;
-    await user.save();
-    return res
-      .status(200)
-      .json({ ok: true, message: "Confirmado correctamente" });
-  } catch (error) {
-    return res.status(500).json({ ok: false, msg: error.message });
-  }
-};
-
-const getOlvidarPassword = async (req, res) => {
-
-}
-
 module.exports = {
   createUser,
   getUser,
   getUsers,
   updateUser,
   deleteUser,
-  getUserConfirmation,
 };
