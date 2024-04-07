@@ -68,7 +68,7 @@ const sendMail = async (user, token) => {
     <h1>Por favor, confirma tu dirección de correo electrónico</h1>
     <p>Gracias por unirte a Brandindoor. Para completar el registro, por favor confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:</p>
     <div style="text-align: center;">
-      <a href="http://localhost:4000/api/auth/verification/reset-password/${token}" class="button">Confirmar dirección de correo electrónico</a>
+      <a href=http://192.168.1.3:5173/verification/${token}" class="button">Confirmar dirección de correo electrónico</a>
     </div>
     <p>Si tienes algún problema al hacer clic en el botón de arriba, copia y pega el siguiente enlace en tu navegador:</p>
     <p>xperiences@info.com</p>
@@ -175,7 +175,7 @@ const sendVerificationEmail = async (user, token) => {
       <h1>Restablecer contraseña</h1>
       <p>Has solicitado restablecer tu contraseña. Haz clic en el botón de abajo para crear una nueva contraseña:</p>
       <div style="text-align: center;">
-        <a href="http://localhost:4000/api/auth/verification/reset-password/${token}" class="button">Restablecer contraseña</a>
+        <a href="http://192.168.1.3:5173/change-password/${token}" class="button">Restablecer contraseña</a>
       </div>
       <p>Si no solicitaste restablecer tu contraseña, puedes ignorar este correo electrónico.</p>
       <p>Gracias,<br>El equipo de Brandindoor</p>

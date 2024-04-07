@@ -3,7 +3,8 @@ const generarJWY = require("../helpers/jwt.js");
 const jwt = require("jsonwebtoken");
 const { sendVerificationEmail } = require("../config/email/emailServices.js");
 const bcrypt = require("bcrypt");
-const { where } = require("sequelize");
+require("dotenv").config();
+
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -58,8 +59,10 @@ const revalidateToken = async (req, res) => {
 //Confirmar cuenta
 const getUserConfirmation = async (req, res) => {
   const { token } = req.params;
+  console.log(token,"token");
   try {
     const { id } = jwt.verify(token, process.env.SECRET_JWT_SEED);
+    console.log(id,"id");
     const user = await User.findOne({ where: { id } });
     if (!user) {
       return res.status(401).json({
@@ -67,18 +70,14 @@ const getUserConfirmation = async (req, res) => {
         msg: "Error en el token del usuario",
       });
     }
-    if (!user.isActive) {
-      user.isActive = true;
-      await user.save();
-      return res
-        .status(200)
-        .json({ ok: true, verify: true, message: "Confirmado correctamente" });
-    } else {
-      return res
-        .status(200)
-        .json({ ok: true, verify: false, message: "Confirmado correctamente" });
-    }
+    console.log(user,"user");
+    user.isActive = true;
+    await user.save();
+    return res
+      .status(200)
+      .json({ ok: true, message: "Confirmado correctamente" });
   } catch (error) {
+    console.log(error,"error");
     return res.status(500).json({ ok: false, msg: error.message });
   }
 };
@@ -130,8 +129,8 @@ const getTokenVerification = async (req, res) => {
 };
 
 const postResetPassword = async (req, res) => {
-  const { password , id} = req.body;
- 
+  const { password, id } = req.body;
+
   try {
     const user = await User.findOne({ where: { id } });
     if (!user) {
@@ -158,43 +157,6 @@ const postResetPassword = async (req, res) => {
   }
 };
 
-const resetPasswordWithToken = async (req, res) => {
-  const { token } = req.params;
-  const { password } = req.body;
-
-  try {
-    const decodedToken = jwt.verify(token, process.env.SECRET_JWT_SEED);
-    const user = await User.findByPk(decodedToken.id);
-
-    if (!user) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Usuario no encontrado",
-      });
-    }
-    if (!password) {
-      return res.status(400).json({
-        ok: false,
-        msg: "Se requiere una contraseña",
-      });
-    }
-
-    const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
-    user.password = hashedPassword;
-    await user.save();
-
-    return res.status(200).json({
-      ok: true,
-      msg: "Contraseña actualizada correctamente",
-    });
-  } catch (error) {
-    return res.status(401).json({
-      ok: false,
-      msg: "Token inválido o expirado",
-    });
-  }
-};
-
 module.exports = {
   loginUser,
   revalidateToken,
@@ -202,5 +164,4 @@ module.exports = {
   postVerificationEmail,
   getTokenVerification,
   postResetPassword,
-  // resetPasswordWithToken
 };

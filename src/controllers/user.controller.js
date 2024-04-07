@@ -55,7 +55,7 @@ const createUser = async (req, res) => {
     sendMail(newUser, token);
     return res
       .status(200)
-      .json({ ok: true, newUser, msg: "Creado correctamente" });
+      .json({ ok: true, newUser,token, msg: "Creado correctamente" });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }
