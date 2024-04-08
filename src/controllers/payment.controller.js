@@ -1,36 +1,29 @@
 const Payment = require("../models/Payment.js");
 const User = require("../models/User.js");
-const Season = require("../models/Season.js");
+// const Season = require("../models/Season.js");
 
 const getPayments = async (req, res) => {
+  let payments;
+  const id = req.id;
   try {
-    const payments = await Payment.findAll({
-      include: [
-        { model: User, as: "User", attributes: ["name"] }],
-      attributes: { exclude: ["userId"] },
-    });
-    if (!payments) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Error al listar pagos",
+    const user = await User.findByPk(id);
+    if (user.rol === "Administrador") {
+      payments = await Payment.findAll({
+        include: [{ model: User, as: "User", attributes: ["name"] }],
+        attributes: { exclude: ["userId"] },
+      });
+    } else {
+      payments = await Payment.findAll({
+        where: { userId: id },
       });
     }
-
-    const modifiedPayments = payments.map(payment => {
-      const {User, Season, ...rest} = payment.toJSON();
-      return {
-        ...rest,
-        userId: User ? User.name : null,
-        seasonId: Season ? Season.name : null
-      }
-    })
-
-    return res.status(200).json({ ok: true, payments: modifiedPayments });
-  } catch (error) {
-    return res.status(500).json({
-      ok: false,
-      msg: error.message,
+    return res.status(200).json({
+      ok: true,
+      id,
+      payments,
     });
+  } catch (error) {
+    console.log(error, "error");
   }
 };
 

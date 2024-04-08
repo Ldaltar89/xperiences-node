@@ -10,6 +10,8 @@ const Sequelize = require("./database/database.js");
 // const ExamType = require("./models/ExamType.js");
 // const Exam = require("./models/Exam.js");
 // const UserExam = require("./models/UserExam.js");
+// const Schedule = require("./models/Schedule.js");
+// const Appointment = require("./models/Appointment.js");
 
 // const Question = require("./models/Question.js");
 async function main() {

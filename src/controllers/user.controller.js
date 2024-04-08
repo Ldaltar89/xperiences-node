@@ -50,7 +50,7 @@ const createUser = async (req, res) => {
         .json({ ok: false, msg: "Faltan datos obligatorios." });
     }
     const newUser = await User.create(req.body);
-    const token = await generarJWY(newUser.id, "1m");
+    const token = await generarJWY(newUser.id, "24h");
 
     sendMail(newUser, token);
     return res

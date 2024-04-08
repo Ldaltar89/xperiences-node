@@ -59,10 +59,8 @@ const revalidateToken = async (req, res) => {
 //Confirmar cuenta
 const getUserConfirmation = async (req, res) => {
   const { token } = req.params;
-  console.log(token,"token");
   try {
     const { id } = jwt.verify(token, process.env.SECRET_JWT_SEED);
-    console.log(id,"id");
     const user = await User.findOne({ where: { id } });
     if (!user) {
       return res.status(401).json({
@@ -70,14 +68,12 @@ const getUserConfirmation = async (req, res) => {
         msg: "Error en el token del usuario",
       });
     }
-    console.log(user,"user");
     user.isActive = true;
     await user.save();
     return res
       .status(200)
       .json({ ok: true, message: "Confirmado correctamente" });
   } catch (error) {
-    console.log(error,"error");
     return res.status(500).json({ ok: false, msg: error.message });
   }
 };
