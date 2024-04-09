@@ -3,8 +3,8 @@ const generarJWY = require("../helpers/jwt.js");
 const jwt = require("jsonwebtoken");
 const { sendVerificationEmail } = require("../config/email/emailServices.js");
 const bcrypt = require("bcrypt");
+const { where } = require("sequelize");
 require("dotenv").config();
-
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
@@ -41,19 +41,24 @@ const loginUser = async (req, res) => {
 };
 
 const revalidateToken = async (req, res) => {
-  const { id, email, name, lastname, rol } = req;
+  try {
+    const id = req.id;
+    //Generar el Token
+    const token = await generarJWY(id, "24h");
+    //obtener el usuario por UID
+    const user = await User.findOne({ where: { id } });
 
-  const token = await generarJWY(id, email, name, lastname, rol);
-
-  return res.status(200).json({
-    ok: true,
-    id,
-    email,
-    name,
-    lastname,
-    rol,
-    token,
-  });
+    return res.status(200).json({
+      ok: true,
+      token,
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      ok: false,
+      msg: "Error en el email y contraseña",
+    });
+  }
 };
 
 //Confirmar cuenta

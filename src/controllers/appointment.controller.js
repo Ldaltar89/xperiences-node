@@ -10,7 +10,7 @@ const getAppointments = async (req, res) => {
         { model: User, as: "User", attributes: ["name"] },
         { model: Schedule, as: "Schedule", attributes: ["Day"] },
       ],
-      attributes:{exclude:["userId", "scheduleId"]}
+      attributes: { exclude: ["userId", "scheduleId"] },
     });
     if (!appointments) {
       return res.status(401).json({
@@ -20,14 +20,16 @@ const getAppointments = async (req, res) => {
     }
 
     const modifiedAppointments = appointments.map((appointment) => {
-      const {User, Schedule, ...rest} = appointment.toJSON();
+      const { User, Schedule, ...rest } = appointment.toJSON();
       return {
         ...rest,
-        userId : User ? User.name : null,
-        scheduleId: Schedule ? Schedule.Day : null
-      }
+        userId: User ? User.name : null,
+        scheduleId: Schedule ? Schedule.Day : null,
+      };
     });
-    return res.status(200).json({ ok: true, appointments: modifiedAppointments });
+    return res
+      .status(200)
+      .json({ ok: true, appointments: modifiedAppointments });
   } catch (error) {
     return res.status(500).json({
       ok: false,
