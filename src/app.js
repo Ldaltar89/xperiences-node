@@ -22,10 +22,4 @@ app.use("/api/userExam", require("./routes/userExam.js"));
 app.use("/api/schedule", require("./routes/schedule.js"));
 app.use("/api/appointment", require("./routes/appointment.js"));
 
-
-// app.use("/api/question", require("./routes/question.js"));
-
-
-
-// export default app;
 module.exports = app ;

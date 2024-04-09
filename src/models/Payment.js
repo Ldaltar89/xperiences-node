@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
+const User = require("./User.js");
 
 const Payment = Sequelize.define("Payment", {
   id: {
@@ -21,7 +22,7 @@ const Payment = Sequelize.define("Payment", {
     },
   },
   reference: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.STRING(50),
     allowNull: false,
     unique: {
       args: true,
@@ -66,7 +67,7 @@ const Payment = Sequelize.define("Payment", {
     type: DataTypes.STRING,
   },
   seasonId: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.STRING(30),
   },
   isActive: {
     type: DataTypes.BOOLEAN,
@@ -86,6 +87,17 @@ const Payment = Sequelize.define("Payment", {
   updatedBy: {
     type: DataTypes.STRING(100),
   },
+});
+
+// Relación entre User y Payment
+User.hasMany(Payment, {
+  foreignKey: "userId",
+  sourceKey: "id",
+});
+
+Payment.belongsTo(User, {
+  foreignKey: "userId",
+  targetKey: "id",
 });
 
 module.exports = Payment;

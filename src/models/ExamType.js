@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
-const Exam = require("./Exam.js")
+
 
 const ExamType = Sequelize.define('ExamType', {
   id: {
@@ -44,15 +44,5 @@ const ExamType = Sequelize.define('ExamType', {
   },
 });
 
-// Relación entre ExamType y Exam
-ExamType.hasMany(Exam, {
-  foreignKey: "examTypeId",
-  sourceKey: "id",
-});
-
-Exam.belongsTo(ExamType, {
-  foreignKey: "examTypeId",
-  targetId: "id",
-});
 
 module.exports = ExamType;

@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
+const ExamType = require("./ExamType.js");
 
 const Exam = Sequelize.define("Exam", {
   id: {
@@ -45,6 +46,9 @@ const Exam = Sequelize.define("Exam", {
       },
     },
   },
+  seasonId: {
+    type: DataTypes.STRING(30),
+  },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
@@ -68,6 +72,15 @@ const Exam = Sequelize.define("Exam", {
   },
 });
 
+// Relación entre ExamType y Exam
+ExamType.hasMany(Exam, {
+  foreignKey: "examTypeId",
+  sourceKey: "id",
+});
 
+Exam.belongsTo(ExamType, {
+  foreignKey: "examTypeId",
+  targetId: "id",
+});
 
 module.exports = Exam;

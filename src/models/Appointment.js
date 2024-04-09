@@ -53,6 +53,4 @@ Appointment.belongsTo(User, {
   targetKey: "id",
 });
 
-
-
 module.exports = Appointment;

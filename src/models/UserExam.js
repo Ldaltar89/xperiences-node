@@ -26,7 +26,7 @@ const UserExam = Sequelize.define("User_examns", {
     type: DataTypes.DECIMAL(5, 2),
   },
   season_id: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.STRING(30),
   },
   isActive: {
     type: DataTypes.BOOLEAN,

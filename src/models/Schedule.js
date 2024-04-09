@@ -7,13 +7,13 @@ const Schedule = Sequelize.define("Schedule", {
     primaryKey: true,
     defaultValue: DataTypes.UUIDV4,
   },
-  TimeRangeInit: {
+  timeRangeInit: {
     type: DataTypes.TIME,
   },
-  TimeRangeEnd: {
+  timeRangeEnd: {
     type: DataTypes.TIME,
   },
-  Day: {
+  day: {
     type: DataTypes.STRING(20),
   },
   isActive: {

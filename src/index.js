@@ -13,7 +13,6 @@ const Sequelize = require("./database/database.js");
 // const Schedule = require("./models/Schedule.js");
 // const Appointment = require("./models/Appointment.js");
 
-// const Question = require("./models/Question.js");
 async function main() {
   try {
     await Sequelize.sync({ force: false });

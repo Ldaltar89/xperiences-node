@@ -1,8 +1,8 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
 const bcrypt = require("bcrypt");
-const Payment = require("./Payment.js");
-const UserContract = require("./UserContract.js");
+const Season = require("./Season.js");
+const University = require("./University.js");
 
 const User = Sequelize.define(
   "User",
@@ -85,7 +85,7 @@ const User = Sequelize.define(
       },
     },
     rol: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING(30),
     },
     birthday: {
       type: DataTypes.STRING(100),
@@ -143,26 +143,25 @@ User.prototype.validarPassword = function (password) {
   return bcrypt.compareSync(password, this.password);
 };
 
-// Relación entre User y Payment
-User.hasMany(Payment, {
-  foreignKey: "userId",
+// Relación entre Season y User
+Season.hasMany(User, {
+  foreignKey: "seasonId",
   sourceKey: "id",
 });
 
-Payment.belongsTo(User, {
-  foreignKey: "userId",
-  targetKey: "id",
+User.belongsTo(Season, {
+  foreignKey: "seasonId",
+  targetId: "id",
 });
 
-// Relación entre User y UserContract
-User.hasMany(UserContract, {
-  foreignKey: "userId",
+// Relación entre University y User
+University.hasMany(User, {
+  foreignKey: "universityId",
   sourceKey: "id",
 });
 
-UserContract.belongsTo(User, {
-  foreignKey: "userId",
-  targetKey: "id",
+User.belongsTo(University, {
+  foreignKey: "universityId",
+  targetId: "id",
 });
-
 module.exports = User;

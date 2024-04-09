@@ -1,11 +1,5 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
-const User = require("./User.js");
-const Contract = require("./Contract.js");
-const UserContract = require("./UserContract.js");
-const Payment = require("./Payment.js");
-const Exam = require("./Exam.js");
-
 
 const Season = Sequelize.define("Season", {
   id: {
@@ -65,58 +59,4 @@ const Season = Sequelize.define("Season", {
   },
 });
 
-// Relación entre Season y User
-Season.hasMany(User, {
-  foreignKey: "seasonId",
-  sourceKey: "id",
-});
-
-User.belongsTo(Season, {
-  foreignKey: "seasonId",
-  targetId: "id",
-});
-
-// Relación entre Season y Contract
-// Season.hasMany(Contract, {
-//   foreignKey: 'seasonId',
-//   sourceKey: 'id',
-// });
-
-// Contract.belongsTo(Season, {
-//   foreignKey: 'seasonId',
-//   targetKey: 'id',
-// });
-
-// Relación entre Season y UserContract
-// Season.hasMany(UserContract, {
-//   foreignKey: 'seasonId',
-//   sourceKey: 'id',
-// });
-
-// UserContract.belongsTo(Season, {
-//   foreignKey: 'seasonId',
-//   targetKey: 'id',
-// });
-
-// Relación entre Season y Payment
-// Season.hasMany(Payment, {
-//   foreignKey: 'seasonId',
-//   sourceKey: 'id',
-// });
-
-// Payment.belongsTo(Season, {
-//   foreignKey: 'seasonId',
-//   targetKey: 'id',
-// });
-
-// Relación entre Season y Exam
-// Season.hasMany(Exam, {
-//   foreignKey: 'seasonId',
-//   sourceKey: 'id',
-// });
-
-// Exam.belongsTo(Season, {
-//   foreignKey: 'seasonId',
-//   targetKey: 'id',
-// });
 module.exports = Season;
