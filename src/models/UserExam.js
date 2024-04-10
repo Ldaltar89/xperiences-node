@@ -67,4 +67,5 @@ UserExam.belongsTo(Exam, {
   foreignKey: "examId",
   targetKey: "id",
 });
+
 module.exports = UserExam;

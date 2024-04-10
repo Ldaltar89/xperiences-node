@@ -1,42 +1,41 @@
 const Payment = require("../models/Payment.js");
 const User = require("../models/User.js");
-// const Season = require("../models/Season.js");
 
 const getPayments = async (req, res) => {
-  let payments;
   const id = req.id;
   try {
     const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ ok: false, msg: "Usuario no encontrado" });
+    }
+    let payments;
     if (user.rol === "Administrador") {
       payments = await Payment.findAll({
-        include: [{ model: User, as: "User", attributes: ["name"] }],
+        include: [{ model: User, as: "User", attributes: ["name", "lastname"] }],
         attributes: { exclude: ["userId"] },
-      });
-
-      const modifiedPayments = payments.map((payment) => {
-        const { User, ...rest } = payment.toJSON();
-        return {
-          ...rest,
-          userId: User ? User.name : null,
-        };
-      });
-      return res.status(200).json({
-        ok: true,
-        id,
-        payments: modifiedPayments,
       });
     } else {
       payments = await Payment.findAll({
         where: { userId: id },
+        include: [{ model: User, as: "User", attributes: ["name", "lastname"] }],
+        attributes: { exclude: ["userId"] },
       });
     }
-    return res.status(200).json({
-      ok: true,
-      id,
-      payments,
+    if (!payments || payments.length === 0) {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No se encontraron payments" });
+    }
+    const modifiedPayments = payments.map((payment) => {
+      const {User, ...rest } = payment.toJSON();
+      return {
+        ...rest,
+        userId: User ? `${User.name} ${User.lastname}` : null,
+      };
     });
+    return res.status(200).json({ ok: true, payments: modifiedPayments });
   } catch (error) {
-    console.log(error, "error");
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 

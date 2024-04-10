@@ -1,32 +1,49 @@
 const UserContract = require("../models/UserContract.js");
 const User = require("../models/User.js");
 const Contract = require("../models/Contract.js");
-// const Season = require("../models/Season.js");
-const { sendUserContractEmail } = require("../config/email/emailServices.js");
+const {
+  sendUserContractEmailUpdate,
+  sendUserContractEmail,
+} = require("../config/email/emailServices.js");
 const { generatePDF } = require("../config/pdf/pdfServices.js");
 const path = require("path");
 
 const getUserContracts = async (req, res) => {
+  const id = req.id;
   try {
-    const userContracts = await UserContract.findAll({
-      include: [
-        { model: User, as: "User", attributes: ["name"] },
-        { model: Contract, as: "Contract", attributes: ["name"] },
-      ],
-      attributes: { exclude: ["userId", "contractId", "seasonId"] },
-    });
-    if (!userContracts) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Error al listar contratos de usuario",
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ ok: false, msg: "Usuario no encontrado" });
+    }
+    let userContracts;
+    if (user.rol === "Administrador") {
+      userContracts = await UserContract.findAll({
+        include: [
+          { model: User, as: "User", attributes: ["name", "lastname"] },
+          { model: Contract, as: "Contract", attributes: ["name"] },
+        ],
+        attributes: { exclude: ["userId", "contractId"] },
+      });
+    } else {
+      userContracts = await UserContract.findAll({
+        where: { userId: id },
+        include: [
+          { model: User, as: "User", attributes: ["name", "lastname"] },
+          { model: Contract, as: "Contract", attributes: ["name"] },
+        ],
+        attributes: { exclude: ["userId", "contractId"] },
       });
     }
-
+    if (!userContracts || userContracts.length === 0) {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No se encontraron userContracts" });
+    }
     const modifiedUserContracts = userContracts.map((userContract) => {
-      const { User, Contract, Season, ...rest } = userContract.toJSON();
+      const { User, Contract, ...rest } = userContract.toJSON();
       return {
         ...rest,
-        userId: User ? User.name : null,
+        userId: User ? `${User.name} ${User.lastname}` : null,
         contractId: Contract ? Contract.name : null,
       };
     });
@@ -34,17 +51,14 @@ const getUserContracts = async (req, res) => {
       .status(200)
       .json({ ok: true, userContracts: modifiedUserContracts });
   } catch (error) {
-    return res.status(500).json({
-      ok: false,
-      msg: error.message,
-    });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
 const createUserContract = async (req, res) => {
-
   try {
-    const { userId, contractId, contract } = req.body;
+    const { userId, contractId, contract, contract_signed } = req.body;
+    const loggedInUserId = req.id;
 
     // Obtener datos de usuario desde la base de datos
     const user = await User.findOne({
@@ -66,24 +80,22 @@ const createUserContract = async (req, res) => {
     // Generar PDF a partir del contenido HTML del contrato con datos de usuario reemplazados
     const pdfPath = await generatePDF(processedContract);
 
-    // Obtener solo el nombre del archivo PDF
-    // const pdfName = path.basename(pdfPath.toString());
+    // Enviar el contrato por correo electrónico
+    await sendUserContractEmail(user, pdfPath);
 
     // Guardar la ruta del PDF en la base de datos
     const newUserContract = await UserContract.create({
       userId,
       contractId,
       contract: processedContract,
+      contract_signed,
     });
-
-    // Enviar el contrato por correo electrónico
-    await sendUserContractEmail(user, pdfPath);
 
     return res.status(201).json({
       ok: true,
       newUserContract: {
         ...newUserContract.toJSON(),
-        userId: user ? user.name : null,
+        userId: user ? `${user.name} ${user.lastname}` : null,
         contractId: contractData ? contractData.name : null,
         contract: processedContract,
       },
@@ -112,26 +124,6 @@ const getUserContract = async (req, res) => {
 };
 
 const updateUserContract = async (req, res) => {
-  //   const { id } = req.params;
-  //   try {
-  //     const userContract = await UserContract.findOne({
-  //       where: { id },
-  //     });
-  //     if (!userContract) {
-  //       return res.status(401).json({
-  //         ok: false,
-  //         msg: error.message,
-  //       });
-  //     }
-  //     userContract.set(req.body);
-  //     await userContract.save();
-  //     return res
-  //       .status(200)
-  //       .json({ ok: true, userContract, msg: "Actualizado correctamente" });
-  //   } catch (error) {
-  //     return res.status(500).json({ ok: false, msg: error.message });
-  //   }
-  // };
   const { id } = req.params;
   try {
     const userContract = await UserContract.findOne({
@@ -144,12 +136,11 @@ const updateUserContract = async (req, res) => {
       });
     }
 
-    const { userId, contractId, contract, contract_signed} =
-      req.body;
+    const { userId, contractId, contract, contract_signed } = req.body;
 
     const user = await User.findOne({
       where: { id: userId },
-      attributes: ["name", "dni"],
+      attributes: ["name", "dni", "lastname", "email"],
     });
 
     const contractData = await Contract.findOne({
@@ -162,15 +153,15 @@ const updateUserContract = async (req, res) => {
       /{dni}/g,
       user ? user.dni : ""
     );
-
     userContract.set({
       userId,
       contractId,
       contract: processedContract,
       contract_signed, // incluir el contract_signed recibido en la solicitud
     });
+    const pdfPath = await generatePDF(processedContract);
+    await sendUserContractEmailUpdate(user, pdfPath);
     await userContract.save();
-
     return res.status(200).json({
       ok: true,
       userContract: {

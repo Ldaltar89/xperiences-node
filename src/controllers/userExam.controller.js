@@ -4,19 +4,36 @@ const User = require("../models/User.js");
 const { where } = require("sequelize");
 
 const getUserExams = async (req, res) => {
+  const id = req.id;
   try {
-    const userExams = await UserExam.findAll({
-      include: [
-        { model: Exam, as: "Exam", attributes: ["name"] },
-        { model: User, as: "User", attributes: ["name"] },
-      ],
-      attributes: { exclude: ["examId", "userId"] },
-    });
-    if (!userExams) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Error al listar el User Examenes",
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ ok: false, msg: "Usuario no encontrado" });
+    }
+    let userExams;
+    if (user.rol === "Administrador") {
+      userExams = await UserExam.findAll({
+        include: [
+          { model: Exam, as: "Exam", attributes: ["name"] },
+          { model: User, as: "User", attributes: ["name", "lastname"] },
+        ],
+        attributes: { exclude: ["examId", "userId"] },
       });
+    } else {
+      userExams = await UserExam.findAll({
+        where: { userId: id },
+        include: [
+          { model: Exam, as: "Exam", attributes: ["name"] },
+          { model: User, as: "User", attributes: ["name", "lastname"] },
+        ],
+        attributes: { exclude: ["examId", "userId"] },
+      });
+    }
+
+    if (!userExams || userExams.length === 0) {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "No se encontraron User Exams" });
     }
 
     const modifiedUserExams = userExams.map((userExam) => {
@@ -24,15 +41,13 @@ const getUserExams = async (req, res) => {
       return {
         ...rest,
         examId: Exam ? Exam.name : null,
-        userId: User ? User.name : null,
+        userId: User ? `${User.name} ${User.lastname}` : null,
       };
     });
+
     return res.status(200).json({ ok: true, userExams: modifiedUserExams });
   } catch (error) {
-    return res.status(500).json({
-      ok: false,
-      msg: error.message,
-    });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -42,14 +57,14 @@ const createUserExam = async (req, res) => {
 
     const user = await User.findOne({
       where: { id: userId },
-      attributes: ["name"],
+      attributes: ["name", "lastname"],
     });
 
-    if(!user){
+    if (!user) {
       return res.status(401).json({
-        ok:false,
-        msg:"Error en el id del User"
-      })
+        ok: false,
+        msg: "Error en el id del User",
+      });
     }
 
     const exam = await Exam.findOne({
@@ -57,19 +72,23 @@ const createUserExam = async (req, res) => {
       attributes: ["name"],
     });
 
-    if(!exam){
+    if (!exam) {
       return res.status(401).json({
-        ok:false,
-        msg:"Error en el id del Exam"
-      })
+        ok: false,
+        msg: "Error en el id del Exam",
+      });
     }
 
-    const newUserExam = await UserExam.create({ userId, examId, ...userExamData });
+    const newUserExam = await UserExam.create({
+      userId,
+      examId,
+      ...userExamData,
+    });
     return res.status(200).json({
       ok: true,
       newUserExam: {
         ...newUserExam.toJSON(),
-        userId: user ? user.name : null,
+        userId: user ? `${user.name} ${user.lastname}` : null,
         examId: exam ? exam.name : null,
       },
       msg: "Creado correctamente",

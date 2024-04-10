@@ -1,7 +1,6 @@
 const { DataTypes } = require("sequelize");
 const Sequelize = require("../database/database.js");
 
-
 const Contract = Sequelize.define("Contract", {
   id: {
     type: DataTypes.UUID,
@@ -59,6 +58,5 @@ const Contract = Sequelize.define("Contract", {
     type: DataTypes.STRING(100),
   },
 });
-
 
 module.exports = Contract;

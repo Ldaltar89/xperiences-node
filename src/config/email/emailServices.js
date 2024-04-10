@@ -122,6 +122,42 @@ const sendUserContractEmail = async (user, contractBuffer) => {
   await transport.sendMail(mailOptions);
 };
 
+const sendUserContractEmailUpdate = async (user, contractBuffer) => {
+  const transport = createTrans();
+   const htmlTemplate = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Contrato Actualizado generado para el usuario ${user.name} ${user.lastname}</title>
+    </head>
+    <body>
+      <p>Su contrato actualizado ha sido generado correctamente.</p>
+      <p>Adjunto encontrará el contrato generado para usted.</p>
+    </body>
+    </html>
+  `;
+
+  const mailOptions = {
+    from: "xperiences@gmail.com",
+    to: `${user.email}`,
+    cc: "manager@example.com",
+    subject: `Contrato actualizado generado para el usuario ${user.name} ${user.lastname}`, // Asunto del correo electrónico
+    html: htmlTemplate,
+    attachments: [
+      {
+        filename: `${user.name}_${user.lastname}_${user.dni}.pdf`, // Nombre personalizado del archivo PDF
+        content: contractBuffer, // Contenido del archivo adjunto (PDF)
+        contentType: "application/pdf", // Tipo de contenido del archivo adjunto
+      },
+    ],
+  };
+
+  // Enviar el correo electrónico
+  await transport.sendMail(mailOptions);
+};
+
 const sendVerificationEmail = async (user, token) => {
   const transport = createTrans();
   const htmlTemplate = `<!DOCTYPE html>
@@ -193,4 +229,4 @@ const sendVerificationEmail = async (user, token) => {
 };
 
 
-module.exports = { sendMail, sendUserContractEmail, sendVerificationEmail };
+module.exports = { sendMail, sendUserContractEmail, sendVerificationEmail, sendUserContractEmailUpdate };
