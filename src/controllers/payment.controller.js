@@ -12,6 +12,19 @@ const getPayments = async (req, res) => {
         include: [{ model: User, as: "User", attributes: ["name"] }],
         attributes: { exclude: ["userId"] },
       });
+
+      const modifiedPayments = payments.map((payment) => {
+        const { User, ...rest } = payment.toJSON();
+        return {
+          ...rest,
+          userId: User ? User.name : null,
+        };
+      });
+      return res.status(200).json({
+        ok: true,
+        id,
+        payments: modifiedPayments,
+      });
     } else {
       payments = await Payment.findAll({
         where: { userId: id },
