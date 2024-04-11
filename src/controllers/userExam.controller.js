@@ -204,14 +204,14 @@ const updateUserExam = async (req, res) => {
     }
 
     // Obtener el usuario que creó el examen
-    const createdByUser = await User.findByPk(userExam.createdBy, {
-      attributes: ["name", "lastname"],
-    });
+    // const createdByUser = await User.findByPk(userExam.createdBy, {
+    //   attributes: ["name", "lastname"],
+    // });
 
     // Obtener el usuario que actualizó el examen
-    const updatedByUser = await User.findByPk(updatedBy, {
-      attributes: ["name", "lastname"],
-    });
+    // const updatedByUser = await User.findByPk(updatedBy, {
+    //   attributes: ["name", "lastname"],
+    // });
     if (!updatedByUser) {
       return res
         .status(500)
