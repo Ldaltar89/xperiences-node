@@ -212,11 +212,11 @@ const updateUserExam = async (req, res) => {
     // const updatedByUser = await User.findByPk(updatedBy, {
     //   attributes: ["name", "lastname"],
     // });
-    if (!updatedByUser) {
-      return res
-        .status(500)
-        .json({ ok: false, msg: "Usuario que actualizo no existe" });
-    }
+    // if (!updatedByUser) {
+    //   return res
+    //     .status(500)
+    //     .json({ ok: false, msg: "Usuario que actualizo no existe" });
+    // }
 
     // Obtener el usuario que realizó el examen
     const user = await User.findByPk(userId, {
