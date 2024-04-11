@@ -34,11 +34,11 @@ const getUserContracts = async (req, res) => {
         attributes: { exclude: ["userId", "contractId"] },
       });
     }
-    if (!userContracts || userContracts.length === 0) {
-      return res
-        .status(404)
-        .json({ ok: false, msg: "No se encontraron userContracts" });
-    }
+    // if (!userContracts || userContracts.length === 0) {
+    //   return res
+    //     .status(404)
+    //     .json({ ok: false, msg: "No se encontraron userContracts" });
+    // }
     const modifiedUserContracts = userContracts.map((userContract) => {
       const { User, Contract, ...rest } = userContract.toJSON();
       return {
@@ -58,7 +58,6 @@ const getUserContracts = async (req, res) => {
 const createUserContract = async (req, res) => {
   try {
     const { userId, contractId, contract, contract_signed, createdBy } = req.body;
-    const loggedInUserId = req.id;
 
     // Obtener datos de usuario desde la base de datos
     const user = await User.findOne({

@@ -4,12 +4,13 @@ const User = require("../models/User.js");
 const { where, Op } = require("sequelize");
 
 const getUserExams = async (req, res) => {
-  const id = req.id;
+   const id = req.id;
   try {
     const user = await User.findByPk(id);
     if (!user) {
       return res.status(404).json({ ok: false, msg: "Usuario no encontrado" });
     }
+
     let userExams;
     if (user.rol === "Administrador") {
       userExams = await UserExam.findAll({
@@ -30,16 +31,38 @@ const getUserExams = async (req, res) => {
       });
     }
 
-    if (!userExams || userExams.length === 0) {
-      return res
-        .status(404)
-        .json({ ok: false, msg: "No se encontraron User Exams" });
-    }
+    // Obtener los ids de los usuarios creadores y actualizadores
+    const createdByIds = userExams.map((userExam) => userExam.createdBy);
+    const updatedByIds = userExams.map((userExam) => userExam.updatedBy);
 
+    // Consultar los nombres y apellidos de los usuarios creadores y actualizadores
+    const createdByUsers = await User.findAll({
+      where: { id: createdByIds },
+      attributes: ["id", "name", "lastname"],
+    });
+    const updatedByUsers = await User.findAll({
+      where: { id: updatedByIds },
+      attributes: ["id", "name", "lastname"],
+    });
+
+    // Mapear los nombres y apellidos de los usuarios creadores y actualizadores a cada UserExam
     const modifiedUserExams = userExams.map((userExam) => {
-      const { Exam, User, createdBy, updatedBy, ...rest } = userExam.toJSON();
+      const createdByUser = createdByUsers.find(
+        (user) => user.id === userExam.createdBy
+      );
+      const updatedByUser = updatedByUsers.find(
+        (user) => user.id === userExam.updatedBy
+      );
+      const { Exam, User, ...rest } = userExam.toJSON();
+
       return {
         ...rest,
+        createdBy: createdByUser
+          ? `${createdByUser.name} ${createdByUser.lastname}`
+          : null,
+        updatedBy: updatedByUser
+          ? `${updatedByUser.name} ${updatedByUser.lastname}`
+          : null,
         examId: Exam ? Exam.name : null,
         userId: User ? `${User.name} ${User.lastname}` : null,
       };
@@ -49,6 +72,8 @@ const getUserExams = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }
+
+
 };
 
 const createUserExam = async (req, res) => {

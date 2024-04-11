@@ -27,7 +27,6 @@ const loginUser = async (req, res) => {
 
     return res.json({
       ok: true,
-      msg: "Usuario Logueado",
       id: user.id,
       email: user.email,
       name: user.name,
@@ -50,8 +49,12 @@ const revalidateToken = async (req, res) => {
 
     return res.status(200).json({
       ok: true,
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      lastname: user.lastname,
+      rol: user.rol,
       token,
-      user,
     });
   } catch (error) {
     return res.status(500).json({

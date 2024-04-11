@@ -21,11 +21,11 @@ const getPayments = async (req, res) => {
         attributes: { exclude: ["userId"] },
       });
     }
-    if (!payments || payments.length === 0) {
-      return res
-        .status(404)
-        .json({ ok: false, msg: "No se encontraron payments" });
-    }
+    // if (!payments || payments.length === 0) {
+    //   return res
+    //     .status(404)
+    //     .json({ ok: false, msg: "No se encontraron payments" });
+    // }
     const modifiedPayments = payments.map((payment) => {
       const {User, ...rest } = payment.toJSON();
       return {
