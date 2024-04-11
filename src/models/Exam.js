@@ -53,9 +53,6 @@ const Exam = Sequelize.define("Exam", {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
-  seasonId: {
-    type: DataTypes.STRING(255),
-  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

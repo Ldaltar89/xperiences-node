@@ -57,7 +57,7 @@ const getUserContracts = async (req, res) => {
 
 const createUserContract = async (req, res) => {
   try {
-    const { userId, contractId, contract, contract_signed } = req.body;
+    const { userId, contractId, contract, contract_signed, createdBy } = req.body;
     const loggedInUserId = req.id;
 
     // Obtener datos de usuario desde la base de datos
@@ -89,6 +89,7 @@ const createUserContract = async (req, res) => {
       contractId,
       contract: processedContract,
       contract_signed,
+      createdBy
     });
 
     return res.status(201).json({

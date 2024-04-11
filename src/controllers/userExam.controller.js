@@ -1,7 +1,7 @@
 const UserExam = require("../models/UserExam.js");
 const Exam = require("../models/Exam.js");
 const User = require("../models/User.js");
-const { where } = require("sequelize");
+const { where, Op } = require("sequelize");
 
 const getUserExams = async (req, res) => {
   const id = req.id;
@@ -37,7 +37,7 @@ const getUserExams = async (req, res) => {
     }
 
     const modifiedUserExams = userExams.map((userExam) => {
-      const { Exam, User, ...rest } = userExam.toJSON();
+      const { Exam, User, createdBy, updatedBy, ...rest } = userExam.toJSON();
       return {
         ...rest,
         examId: Exam ? Exam.name : null,
@@ -53,48 +53,48 @@ const getUserExams = async (req, res) => {
 
 const createUserExam = async (req, res) => {
   try {
-    const { userId, examId, ...userExamData } = req.body;
+    const { userId, examId, createdBy, score, idDone } = req.body;
 
-    const user = await User.findOne({
-      where: { id: userId },
+    // Buscar el nombre del usuario que está creando el examen
+    // const createdByUser = await User.findByPk(createdBy, {
+    //   attributes: ["name", "lastname"],
+    // });
+
+    // Buscar el usuario que está realizando el examen
+    const user = await User.findByPk(userId, {
       attributes: ["name", "lastname"],
     });
 
-    if (!user) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Error en el id del User",
-      });
-    }
-
-    const exam = await Exam.findOne({
-      where: { id: examId },
+    // Buscar el examen
+    const exam = await Exam.findByPk(examId, {
       attributes: ["name"],
     });
-
-    if (!exam) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Error en el id del Exam",
-      });
-    }
 
     const newUserExam = await UserExam.create({
       userId,
       examId,
-      ...userExamData,
+      createdBy,
+      score,
+      idDone,
     });
+
     return res.status(200).json({
       ok: true,
       newUserExam: {
         ...newUserExam.toJSON(),
         userId: user ? `${user.name} ${user.lastname}` : null,
+        // createdBy: createdByUser
+        //   ? `${createdByUser.name} ${createdByUser.lastname}`
+        //   : "null",
         examId: exam ? exam.name : null,
       },
       msg: "Creado correctamente",
     });
   } catch (error) {
-    return res.status(500).json({ ok: false, msg: error.message });
+    return res.status(500).json({
+      ok: false,
+      msg: error.message,
+    });
   }
 };
 
@@ -118,21 +118,65 @@ const getUserExam = async (req, res) => {
 
 const updateUserExam = async (req, res) => {
   const { id } = req.params;
+  const { userId, examId, updatedBy, score, idDone } = req.body;
+
   try {
-    const userExam = await UserExam.findOne({
-      where: { id },
-    });
+    // Obtener el registro de UserExam
+    const userExam = await UserExam.findByPk(id);
+
     if (!userExam) {
-      return res.status(401).json({
-        ok: false,
-        msg: "Error con el id del User Examen",
-      });
+      return res
+        .status(401)
+        .json({ ok: false, msg: "Error con el id del User Examen" });
     }
-    userExam.set(req.body);
-    await userExam.save();
-    return res
-      .status(200)
-      .json({ ok: true, userExam, msg: "Actualizado correctamente" });
+
+    // Obtener el usuario que creó el examen
+    const createdByUser = await User.findByPk(userExam.createdBy, {
+      attributes: ["name", "lastname"],
+    });
+
+    // Obtener el usuario que actualizó el examen
+    const updatedByUser = await User.findByPk(updatedBy, {
+      attributes: ["name", "lastname"],
+    });
+    if (!updatedByUser) {
+      return res
+        .status(500)
+        .json({ ok: false, msg: "Usuario que actualizo no existe" });
+    }
+
+    // Obtener el usuario que realizó el examen
+    const user = await User.findByPk(userId, {
+      attributes: ["name", "lastname"],
+    });
+
+    // Obtener el examen
+    const exam = await Exam.findByPk(examId, { attributes: ["name"] });
+
+    // Actualizar el registro
+    await userExam.update({
+      userId,
+      examId,
+      updatedBy,
+      score,
+      idDone,
+    });
+
+    return res.status(200).json({
+      ok: true,
+      userExam: {
+        ...userExam.toJSON(),
+        userId: user ? `${user.name} ${user.lastname}` : null,
+        // createdBy: createdByUser
+        //   ? `${createdByUser.name} ${createdByUser.lastname}`
+        //   : "null",
+        // updatedBy: updatedByUser
+        //   ? `${updatedByUser.name} ${updatedByUser.lastname}`
+        //   : "null",
+        examId: exam ? exam.name : null,
+      },
+      msg: "Actualizado correctamente",
+    });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }
