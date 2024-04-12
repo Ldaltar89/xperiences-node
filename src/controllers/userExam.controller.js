@@ -119,9 +119,6 @@ const getUserExams = async (req, res) => {
   // } catch (error) {
   //   return res.status(500).json({ ok: false, msg: error.message });
   // }
-
-
-
 };
 
 const createUserExam = async (req, res) => {
@@ -191,11 +188,15 @@ const getUserExam = async (req, res) => {
 
 const updateUserExam = async (req, res) => {
   const { id } = req.params;
-  const { userId, examId, updatedBy, score, idDone } = req.body;
+  const {
+    userId,
+    examId,
+    ...rest
+  } = req.body;
 
   try {
     // Obtener el registro de UserExam
-    const userExam = await UserExam.findByPk(id);
+    const userExam = await UserExam.findOne({ where: { id } });
 
     if (!userExam) {
       return res
@@ -230,9 +231,7 @@ const updateUserExam = async (req, res) => {
     await userExam.update({
       userId,
       examId,
-      updatedBy,
-      score,
-      idDone,
+      ...rest
     });
 
     return res.status(200).json({

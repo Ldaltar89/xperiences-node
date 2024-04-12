@@ -60,16 +60,27 @@ const createUserContract = async (req, res) => {
     const { userId, contractId, contract, contract_signed, createdBy } = req.body;
 
     // Obtener datos de usuario desde la base de datos
-    const user = await User.findOne({
-      where: { id: userId },
-      attributes: ["name", "dni", "lastname", "email"],
-    });
+    // const user = await User.findOne({
+    //   where: { id: userId },
+    //   attributes: ["name", "dni", "lastname", "email"],
+    // });
 
-    // Obtener datos del contrato desde la base de datos
-    const contractData = await Contract.findOne({
-      where: { id: contractId },
-      attributes: ["name"],
-    });
+    // // Obtener datos del contrato desde la base de datos
+    // const contractData = await Contract.findOne({
+    //   where: { id: contractId },
+    //   attributes: ["name"],
+    // });
+     // Obtener datos de usuario y contrato de forma paralela
+     const [user, contractData] = await Promise.all([
+      User.findOne({
+        where: { id: userId },
+        attributes: ["name", "dni", "lastname", "email"],
+      }),
+      Contract.findOne({
+        where: { id: contractId },
+        attributes: ["name"],
+      })
+    ]);
 
     // Reemplazar variables en el contrato HTML
     const processedContract = contract
