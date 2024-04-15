@@ -18,6 +18,9 @@ const UserContract = Sequelize.define("UserContract", {
   seasonId: {
     type: DataTypes.STRING(255),
   },
+  pdfUrl: {
+    type: DataTypes.STRING(255),
+  },
   isActive: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,

@@ -123,7 +123,7 @@ const getUserExams = async (req, res) => {
 
 const createUserExam = async (req, res) => {
   try {
-    const { userId, examId, createdBy, score, idDone } = req.body;
+    const { userId, examId, createdBy, score, isDone } = req.body;
 
     // Buscar el nombre del usuario que está creando el examen
     // const createdByUser = await User.findByPk(createdBy, {
@@ -145,7 +145,7 @@ const createUserExam = async (req, res) => {
       examId,
       createdBy,
       score,
-      idDone,
+      isDone,
     });
 
     return res.status(200).json({

@@ -6,7 +6,11 @@ const {
   sendUserContractEmail,
 } = require("../config/email/emailServices.js");
 const { generatePDF } = require("../config/pdf/pdfServices.js");
-const path = require("path");
+const configureCloudinary = require("../config/cloudinary/cloudinaryServices.js");
+const { Readable } = require("stream");
+
+// Llama a la función de configuración de Cloudinary
+configureCloudinary();
 
 const getUserContracts = async (req, res) => {
   const id = req.id;
@@ -34,17 +38,13 @@ const getUserContracts = async (req, res) => {
         attributes: { exclude: ["userId", "contractId"] },
       });
     }
-    // if (!userContracts || userContracts.length === 0) {
-    //   return res
-    //     .status(404)
-    //     .json({ ok: false, msg: "No se encontraron userContracts" });
-    // }
     const modifiedUserContracts = userContracts.map((userContract) => {
       const { User, Contract, ...rest } = userContract.toJSON();
       return {
         ...rest,
         userId: User ? `${User.name} ${User.lastname}` : null,
         contractId: Contract ? Contract.name : null,
+        downloadUrl: `${userContract.pdfURL}?download=true`,
       };
     });
     return res
@@ -57,21 +57,17 @@ const getUserContracts = async (req, res) => {
 
 const createUserContract = async (req, res) => {
   try {
-    const { userId, contractId, contract, contract_signed, createdBy } = req.body;
+    const { userId, contractId, contract, contract_signed, createdBy } =
+      req.body;
 
-    // Obtener datos de usuario desde la base de datos
-    // const user = await User.findOne({
-    //   where: { id: userId },
-    //   attributes: ["name", "dni", "lastname", "email"],
-    // });
+    if (!userId || !contractId) {
+      return res.status(400).json({
+        ok: false,
+        msg: "Se requieren los IDs de usuario y contrato.",
+      });
+    }
 
-    // // Obtener datos del contrato desde la base de datos
-    // const contractData = await Contract.findOne({
-    //   where: { id: contractId },
-    //   attributes: ["name"],
-    // });
-     // Obtener datos de usuario y contrato de forma paralela
-     const [user, contractData] = await Promise.all([
+    const [user, contractData] = await Promise.all([
       User.findOne({
         where: { id: userId },
         attributes: ["name", "dni", "lastname", "email"],
@@ -79,27 +75,57 @@ const createUserContract = async (req, res) => {
       Contract.findOne({
         where: { id: contractId },
         attributes: ["name"],
-      })
+      }),
     ]);
+
+    if (!user || !contractData) {
+      return res
+        .status(404)
+        .json({ ok: false, msg: "Usuario o contrato no encontrado." });
+    }
 
     // Reemplazar variables en el contrato HTML
     const processedContract = contract
       .replace(/{name}/g, user ? user.name : "")
       .replace(/{dni}/g, user ? user.dni : "");
 
-    // Generar PDF a partir del contenido HTML del contrato con datos de usuario reemplazados
-    const pdfPath = await generatePDF(processedContract);
 
-    // Enviar el contrato por correo electrónico
-    await sendUserContractEmail(user, pdfPath);
+    // Generar el PDF con un nombre personalizado
+    const pdfBuffer = await generatePDF(processedContract);
+    const bufferStream = Readable.from(pdfBuffer);
+    
+    // Subir el stream a Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = configureCloudinary().uploader.upload_stream(
+        {
+          public_id: `${user.name}_${user.lastname}_${user.dni}`,
+          resource_type: "auto",
+          folder: "Contratos",
+          format: "pdf",
+        },
+        (error, result) => {
+          if (error) {
+            reject(error);
+          } else {
+            console.log("Cloudinary URL:", result.secure_url);
+            resolve(result);
+          }
+        }
+      );
 
-    // Guardar la ruta del PDF en la base de datos
+      bufferStream.pipe(uploadStream);
+    });
+
+    const cloudinaryUrl = uploadResult.secure_url;
+    await sendUserContractEmail(user, pdfBuffer);
+
     const newUserContract = await UserContract.create({
       userId,
       contractId,
       contract: processedContract,
       contract_signed,
-      createdBy
+      createdBy,
+      pdfUrl: cloudinaryUrl,
     });
 
     return res.status(201).json({
@@ -109,6 +135,7 @@ const createUserContract = async (req, res) => {
         userId: user ? `${user.name} ${user.lastname}` : null,
         contractId: contractData ? contractData.name : null,
         contract: processedContract,
+        pdfUrl: cloudinaryUrl,
       },
       msg: "Contrato de usuario creado correctamente",
     });

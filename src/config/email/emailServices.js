@@ -121,23 +121,20 @@ const sendMail = async (user, token) => {
 //   // Enviar el correo electrónico
 //   await transport.sendMail(mailOptions);
 // };
-
-const fromEmail = "xperiences@gmail.com";
-const ccEmail = "manager@example.com";
-
-const sendUserContractEmail = async (user, contractBuffer) => {
+//--------------------------------------------------------------------------------------
+const sendUserContractEmail = async (user, pdfBuffer) => {
   const htmlTemplate = generateHtmlTemplate(user);
 
   const mailOptions = {
-    from: fromEmail,
+    from: "xperiences@gmail.com",
     to: `${user.email}`,
-    cc: ccEmail,
+    cc: "manager@example.com",
     subject: `Contrato generado para el usuario ${user.name}`,
     html: htmlTemplate,
     attachments: [
       {
         filename: `${user.name}_${user.lastname}_${user.dni}.pdf`,
-        content: contractBuffer,
+        content: pdfBuffer,
         contentType: "application/pdf",
       },
     ],
@@ -165,6 +162,11 @@ const generateHtmlTemplate = (user) => {
   `;
 };
 
+//----------------------------------------------------------------------------------
+
+
+
+//----------------------------------------------------------------------------------
 
 const sendUserContractEmailUpdate = async (user, contractBuffer) => {
   const transport = createTrans();
