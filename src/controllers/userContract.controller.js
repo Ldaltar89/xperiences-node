@@ -12,6 +12,7 @@ const { Readable } = require("stream");
 // Llama a la función de configuración de Cloudinary
 configureCloudinary();
 
+
 const getUserContracts = async (req, res) => {
   const id = req.id;
   try {
@@ -44,7 +45,6 @@ const getUserContracts = async (req, res) => {
         ...rest,
         userId: User ? `${User.name} ${User.lastname}` : null,
         contractId: Contract ? Contract.name : null,
-        downloadUrl: `${userContract.pdfURL}?download=true`,
       };
     });
     return res
@@ -87,20 +87,24 @@ const createUserContract = async (req, res) => {
     // Reemplazar variables en el contrato HTML
     const processedContract = contract
       .replace(/{name}/g, user ? user.name : "")
-      .replace(/{dni}/g, user ? user.dni : "");
-
+      .replace(/{dni}/g, user ? user.dni : "")
+      .replace(/{lastname}/g, user ? user.lastname : "");
 
     // Generar el PDF con un nombre personalizado
-    const pdfBuffer = await generatePDF(processedContract);
+    const pdfBuffer = await generatePDF(processedContract, user);
     const bufferStream = Readable.from(pdfBuffer);
-    
+
+    const d = new Date();
+    let year = d.getFullYear();
+    let month = d.getMonth()+1;
+    let day = d.getDate();
     // Subir el stream a Cloudinary
     const uploadResult = await new Promise((resolve, reject) => {
       const uploadStream = configureCloudinary().uploader.upload_stream(
         {
           public_id: `${user.name}_${user.lastname}_${user.dni}`,
           resource_type: "auto",
-          folder: "Contratos",
+          folder: `Contratos/${year}/${month}/${day}/Contratos_Asignados`,
           format: "pdf",
         },
         (error, result) => {
@@ -143,6 +147,7 @@ const createUserContract = async (req, res) => {
     return res.status(500).json({ ok: false, msg: error.message });
   }
 };
+
 const getUserContract = async (req, res) => {
   const { id } = req.params;
   try {
@@ -164,9 +169,7 @@ const getUserContract = async (req, res) => {
 const updateUserContract = async (req, res) => {
   const { id } = req.params;
   try {
-    const userContract = await UserContract.findOne({
-      where: { id },
-    });
+    const userContract = await UserContract.findByPk(id);
     if (!userContract) {
       return res.status(404).json({
         ok: false,
@@ -174,39 +177,81 @@ const updateUserContract = async (req, res) => {
       });
     }
 
-    const { userId, contractId, contract, contract_signed } = req.body;
+    const { userId, contractId, createdBy } = req.body;
 
-    const user = await User.findOne({
-      where: { id: userId },
-      attributes: ["name", "dni", "lastname", "email"],
-    });
+    if (!userId || !contractId) {
+      return res.status(400).json({
+        ok: false,
+        msg: "Se requieren los IDs de usuario y contrato.",
+      });
+    }
 
-    const contractData = await Contract.findOne({
-      where: { id: contractId },
-      attributes: ["name"],
-    });
+    const [user, contractData] = await Promise.all([
+      User.findOne({
+        where: { id: userId },
+        attributes: ["name", "dni", "lastname", "email"],
+      }),
+      Contract.findOne({
+        where: { id: contractId },
+        attributes: ["name"],
+      }),
+    ]);
 
-    let processedContract = contract.replace(/{name}/g, user ? user.name : "");
-    processedContract = processedContract.replace(
-      /{dni}/g,
-      user ? user.dni : ""
-    );
-    userContract.set({
-      userId,
-      contractId,
-      contract: processedContract,
-      contract_signed, // incluir el contract_signed recibido en la solicitud
-    });
-    const pdfPath = await generatePDF(processedContract);
-    await sendUserContractEmailUpdate(user, pdfPath);
+    if (!user || !contractData) {
+      return res.status(404).json({
+        ok: false,
+        msg: "Usuario o contrato no encontrado.",
+      });
+    }
+
+    // Verifica si se ha subido un nuevo PDF
+    let cloudinaryUrl = userContract.pdfUrl;
+    if (req.file) {
+      const pdfBuffer = req.file.buffer;
+
+      const d = new Date();
+      let year = d.getFullYear();
+      let month = d.getMonth()+1;
+      let day = d.getDate();
+      // Subir el nuevo PDF a Cloudinary
+      const uploadResult = await new Promise((resolve, reject) => {
+        const uploadStream = configureCloudinary().uploader.upload_stream(
+          {
+            public_id: `${user.name}_${user.lastname}_${user.dni}_Modificado`,
+            resource_type: "auto",
+            folder: `Contratos/${year}/${month}/${day}/Contratos_Firmados`,
+            format: "pdf",
+          },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              console.log("Cloudinary URL:", result.secure_url);
+              resolve(result);
+            }
+          }
+        );
+
+        const bufferStream = Readable.from(pdfBuffer);
+        bufferStream.pipe(uploadStream);
+      });
+
+      cloudinaryUrl = uploadResult.secure_url;
+    }
+
+    userContract.userId = userId;
+    userContract.contractId = contractId;
+    userContract.contract_signed = cloudinaryUrl;
+    userContract.createdBy = createdBy;
+
     await userContract.save();
+
     return res.status(200).json({
       ok: true,
       userContract: {
         ...userContract.toJSON(),
-        userId: user ? user.name : null,
-        contractId: contractData ? contractData.name : null,
-        contract: processedContract,
+        userId: `${user.name} ${user.lastname}`,
+        contractId: contractData.name,
       },
       msg: "UserContract actualizado correctamente",
     });
@@ -246,6 +291,7 @@ const deleteUserContract = async (req, res) => {
     return res.status(500).json({ ok: false, msg: error.message });
   }
 };
+
 
 module.exports = {
   getUserContracts,
