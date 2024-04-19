@@ -16,7 +16,7 @@ const getPayments = async (req, res) => {
           { model: User, as: "User", attributes: ["name", "lastname"] },
         ],
         attributes: { exclude: ["userId"] },
-        order: [["createdAt", "ASC"]]
+        order: [["createdAt", "ASC"]],
       });
     } else {
       payments = await Payment.findAll({
@@ -25,7 +25,7 @@ const getPayments = async (req, res) => {
           { model: User, as: "User", attributes: ["name", "lastname"] },
         ],
         attributes: { exclude: ["userId"] },
-        order: [["createdAt", "ASC"]]
+        order: [["createdAt", "ASC"]],
       });
     }
     const modifiedPayments = payments.map((payment) => {
@@ -84,7 +84,7 @@ const updatePayment = async (req, res) => {
     }
 
     if (req.body.isRejected || req.body.isCancelled) {
-      payment.reference = 'null';
+      payment.reference = "null";
     }
 
     if (req.body.isApproved) {
@@ -111,21 +111,25 @@ const updatePayment = async (req, res) => {
 const deletedPayment = async (req, res) => {
   const { id } = req.params;
   try {
-    const payment = await Payment.findOne({ where: { id } });
+    const payment = await Payment.findOne({
+      where: { id },
+      include: [{ model: User, as: "User", attributes: ["name", "lastname"] }],
+      attributes: { exclude: ["userId"] },
+    });
     if (!payment) {
       return res.status(401).json({
         ok: false,
         msg: "Error con el id del pago",
       });
     }
-    const [row, [updatePayment]] = await Payment.update(
-      { isActive: false },
-      { where: { id }, returning: true }
-    );
+    const [row] = await Payment.update({ isActive: false }, { where: { id } });
     if (row > 0) {
+      const { User, ...rest } = payment.toJSON();
+      const userId = User ? `${User.name} ${User.lastname}` : null;
+
       return res.status(200).json({
         ok: true,
-        payment: { ...updatePayment.dataValues },
+        payment: { ...rest, userId },
         msg: "Eliminado correctamente",
       });
     } else {

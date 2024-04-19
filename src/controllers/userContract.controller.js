@@ -1,17 +1,13 @@
 const UserContract = require("../models/UserContract.js");
 const User = require("../models/User.js");
 const Contract = require("../models/Contract.js");
-const {
-  sendUserContractEmailUpdate,
-  sendUserContractEmail,
-} = require("../config/email/emailServices.js");
+const { sendUserContractEmail } = require("../config/email/emailServices.js");
 const { generatePDF } = require("../config/pdf/pdfServices.js");
 const configureCloudinary = require("../config/cloudinary/cloudinaryServices.js");
 const { Readable } = require("stream");
 
 // Llama a la función de configuración de Cloudinary
 configureCloudinary();
-
 
 const getUserContracts = async (req, res) => {
   const id = req.id;
@@ -96,7 +92,7 @@ const createUserContract = async (req, res) => {
 
     const d = new Date();
     let year = d.getFullYear();
-    let month = d.getMonth()+1;
+    let month = d.getMonth() + 1;
     let day = d.getDate();
     // Subir el stream a Cloudinary
     const uploadResult = await new Promise((resolve, reject) => {
@@ -211,7 +207,7 @@ const updateUserContract = async (req, res) => {
 
       const d = new Date();
       let year = d.getFullYear();
-      let month = d.getMonth()+1;
+      let month = d.getMonth() + 1;
       let day = d.getDate();
       // Subir el nuevo PDF a Cloudinary
       const uploadResult = await new Promise((resolve, reject) => {
@@ -263,7 +259,14 @@ const updateUserContract = async (req, res) => {
 const deleteUserContract = async (req, res) => {
   const { id } = req.params;
   try {
-    const userContract = await UserContract.findOne({ where: { id } });
+    const userContract = await UserContract.findOne({
+      where: { id },
+      include: [
+        { model: User, as: "User", attributes: ["name", "lastname"] },
+        { model: Contract, as: "Contract", attributes: ["name"] },
+      ],
+      attributes: { exclude: ["userId", "contractId"] },
+    });
     if (!userContract) {
       return res.status(401).json({
         ok: false,
@@ -271,14 +274,17 @@ const deleteUserContract = async (req, res) => {
       });
     }
 
-    const [row, [updateUserContract]] = await UserContract.update(
+    const [row] = await UserContract.update(
       { isActive: false },
-      { where: { id }, returning: true }
+      { where: { id } }
     );
     if (row > 0) {
+      const { User, Contract, ...rest } = userContract.toJSON();
+      const userId = User ? `${User.name} ${User.lastname}` : null;
+      const contractId = Contract ? Contract.name : null;
       return res.status(200).json({
         ok: true,
-        userContract: { ...updateUserContract.dataValues },
+        userContract: { ...rest, userId, contractId },
         msg: "Eliminado Correctamente",
       });
     } else {
@@ -291,7 +297,6 @@ const deleteUserContract = async (req, res) => {
     return res.status(500).json({ ok: false, msg: error.message });
   }
 };
-
 
 module.exports = {
   getUserContracts,
