@@ -15,12 +15,15 @@ const UserExam = Sequelize.define("UserExams", {
   },
   isApproved: {
     type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   isDisapproved: {
     type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   isCanceled: {
     type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   score: {
     type: DataTypes.DECIMAL(5, 2),

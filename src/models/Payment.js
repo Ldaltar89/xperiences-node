@@ -58,13 +58,16 @@ const Payment = Sequelize.define("Payment", {
     allowNull: false,
   },
   isApproved: {
-    type: DataTypes.STRING,
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   isRejected: {
-    type: DataTypes.STRING,
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   isCancelled: {
-    type: DataTypes.STRING,
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
   },
   seasonId: {
     type: DataTypes.STRING(30),
