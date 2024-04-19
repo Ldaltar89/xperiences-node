@@ -106,12 +106,6 @@ const updateExam = async (req, res) => {
 const deleteExam = async (req, res) => {
   const { id } = req.params;
   try {
-    //     const result = await Exam.update({ isActive: false }, { where: { id } });
-    //     return res.status(200).json({ ok: "Exam deleted" });
-    //   } catch (error) {
-    //     return res.status(500).json({ message: error.message });
-    //   }
-    // };
     const exam = await Exam.findOne({ where: { id } });
     if (!exam) {
       return res.status(401).json({

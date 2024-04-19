@@ -1,4 +1,4 @@
-const { token } = require("morgan");
+
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
@@ -68,7 +68,7 @@ const sendMail = async (user, token) => {
     <h1>Por favor, confirma tu dirección de correo electrónico</h1>
     <p>Gracias por unirte a Brandindoor. Para completar el registro, por favor confirma tu dirección de correo electrónico haciendo clic en el botón de abajo:</p>
     <div style="text-align: center;">
-      <a href="http://192.168.1.3:5173/verification/${token}" class="button">Confirmar dirección de correo electrónico</a>
+      <a href="http://localhost:5173/verification/${token}" class="button">Confirmar dirección de correo electrónico</a>
     </div>
     <p>Si tienes algún problema al hacer clic en el botón de arriba, copia y pega el siguiente enlace en tu navegador:</p>
     <p>xperiences@info.com</p>
@@ -86,42 +86,6 @@ const sendMail = async (user, token) => {
   return;
 };
 
-// const sendUserContractEmail = async (user, contractBuffer) => {
-//   const transport = createTrans();
-//    const htmlTemplate = `
-//     <!DOCTYPE html>
-//     <html lang="en">
-//     <head>
-//       <meta charset="UTF-8">
-//       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//       <title>Contrato generado para el usuario ${user.name}</title>
-//     </head>
-//     <body>
-//       <p>Su contrato ha sido generado correctamente.</p>
-//       <p>Adjunto encontrará el contrato generado para usted.</p>
-//     </body>
-//     </html>
-//   `;
-
-//   const mailOptions = {
-//     from: "xperiences@gmail.com",
-//     to: `${user.email}`,
-//     cc: "manager@example.com",
-//     subject: `Contrato generado para el usuario ${user.name}`, // Asunto del correo electrónico
-//     html: htmlTemplate,
-//     attachments: [
-//       {
-//         filename: `${user.name}_${user.lastname}_${user.dni}.pdf`, // Nombre personalizado del archivo PDF
-//         content: contractBuffer, // Contenido del archivo adjunto (PDF)
-//         contentType: "application/pdf", // Tipo de contenido del archivo adjunto
-//       },
-//     ],
-//   };
-
-//   // Enviar el correo electrónico
-//   await transport.sendMail(mailOptions);
-// };
-//--------------------------------------------------------------------------------------
 const sendUserContractEmail = async (user, pdfBuffer) => {
   const htmlTemplate = generateHtmlTemplate(user);
 
@@ -139,7 +103,7 @@ const sendUserContractEmail = async (user, pdfBuffer) => {
       },
     ],
   };
-
+  
   // Enviar el correo electrónico
   const transport = createTrans();
   await transport.sendMail(mailOptions);
@@ -160,48 +124,6 @@ const generateHtmlTemplate = (user) => {
     </body>
     </html>
   `;
-};
-
-//----------------------------------------------------------------------------------
-
-
-
-//----------------------------------------------------------------------------------
-
-const sendUserContractEmailUpdate = async (user, contractBuffer) => {
-  const transport = createTrans();
-   const htmlTemplate = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Contrato Actualizado generado para el usuario ${user.name} ${user.lastname}</title>
-    </head>
-    <body>
-      <p>Su contrato actualizado ha sido generado correctamente.</p>
-      <p>Adjunto encontrará el contrato generado para usted.</p>
-    </body>
-    </html>
-  `;
-
-  const mailOptions = {
-    from: "xperiences@gmail.com",
-    to: `${user.email}`,
-    cc: "manager@example.com",
-    subject: `Contrato actualizado generado para el usuario ${user.name} ${user.lastname}`, // Asunto del correo electrónico
-    html: htmlTemplate,
-    attachments: [
-      {
-        filename: `${user.name}_${user.lastname}_${user.dni}.pdf`, // Nombre personalizado del archivo PDF
-        content: contractBuffer, // Contenido del archivo adjunto (PDF)
-        contentType: "application/pdf", // Tipo de contenido del archivo adjunto
-      },
-    ],
-  };
-
-  // Enviar el correo electrónico
-  await transport.sendMail(mailOptions);
 };
 
 const sendVerificationEmail = async (user, token) => {
@@ -257,7 +179,7 @@ const sendVerificationEmail = async (user, token) => {
       <h1>Restablecer contraseña</h1>
       <p>Has solicitado restablecer tu contraseña. Haz clic en el botón de abajo para crear una nueva contraseña:</p>
       <div style="text-align: center;">
-        <a href="http://192.168.1.3:5173/change-password/${token}" class="button">Restablecer contraseña</a>
+        <a href="http://localhost:5173/change-password/${token}" class="button">Restablecer contraseña</a>
       </div>
       <p>Si no solicitaste restablecer tu contraseña, puedes ignorar este correo electrónico.</p>
       <p>Gracias,<br>El equipo de Brandindoor</p>
@@ -275,4 +197,4 @@ const sendVerificationEmail = async (user, token) => {
 };
 
 
-module.exports = { sendMail, sendUserContractEmail, sendVerificationEmail, sendUserContractEmailUpdate };
+module.exports = { sendMail, sendUserContractEmail, sendVerificationEmail };

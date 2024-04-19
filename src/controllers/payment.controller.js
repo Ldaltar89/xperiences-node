@@ -1,5 +1,6 @@
 const Payment = require("../models/Payment.js");
 const User = require("../models/User.js");
+const Sequelize = require("sequelize");
 
 const getPayments = async (req, res) => {
   const id = req.id;
@@ -11,23 +12,24 @@ const getPayments = async (req, res) => {
     let payments;
     if (user.rol === "Administrador") {
       payments = await Payment.findAll({
-        include: [{ model: User, as: "User", attributes: ["name", "lastname"] }],
+        include: [
+          { model: User, as: "User", attributes: ["name", "lastname"] },
+        ],
         attributes: { exclude: ["userId"] },
+        order: [["createdAt", "ASC"]]
       });
     } else {
       payments = await Payment.findAll({
         where: { userId: id },
-        include: [{ model: User, as: "User", attributes: ["name", "lastname"] }],
+        include: [
+          { model: User, as: "User", attributes: ["name", "lastname"] },
+        ],
         attributes: { exclude: ["userId"] },
+        order: [["createdAt", "ASC"]]
       });
     }
-    // if (!payments || payments.length === 0) {
-    //   return res
-    //     .status(404)
-    //     .json({ ok: false, msg: "No se encontraron payments" });
-    // }
     const modifiedPayments = payments.map((payment) => {
-      const {User, ...rest } = payment.toJSON();
+      const { User, ...rest } = payment.toJSON();
       return {
         ...rest,
         userId: User ? `${User.name} ${User.lastname}` : null,
@@ -80,6 +82,22 @@ const updatePayment = async (req, res) => {
         msg: "Error con el id del pago",
       });
     }
+
+    if (req.body.isRejected || req.body.isCancelled) {
+      payment.reference = 'null';
+    }
+
+    if (req.body.isApproved) {
+      payment.isRejected = false;
+      payment.isCancelled = false;
+    } else if (req.body.isRejected) {
+      payment.isApproved = false;
+      payment.isCancelled = false;
+    } else if (req.body.isCancelled) {
+      payment.isApproved = false;
+      payment.isRejected = false;
+    }
+
     payment.set(req.body);
     await payment.save();
     return res

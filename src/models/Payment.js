@@ -63,7 +63,7 @@ const Payment = Sequelize.define("Payment", {
   isRejected: {
     type: DataTypes.STRING,
   },
-  isCancel: {
+  isCancelled: {
     type: DataTypes.STRING,
   },
   seasonId: {

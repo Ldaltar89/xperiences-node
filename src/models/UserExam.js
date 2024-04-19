@@ -3,7 +3,7 @@ const Sequelize = require("../database/database.js");
 const User = require("./User.js");
 const Exam = require("./Exam.js");
 
-const UserExam = Sequelize.define("User_examns", {
+const UserExam = Sequelize.define("UserExams", {
   id: {
     type: DataTypes.UUID,
     primaryKey: true,

@@ -124,13 +124,6 @@ const getUserExams = async (req, res) => {
 const createUserExam = async (req, res) => {
   try {
     const { userId, examId, createdBy, score, isDone } = req.body;
-
-    // Buscar el nombre del usuario que está creando el examen
-    // const createdByUser = await User.findByPk(createdBy, {
-    //   attributes: ["name", "lastname"],
-    // });
-
-    // Buscar el usuario que está realizando el examen
     const user = await User.findByPk(userId, {
       attributes: ["name", "lastname"],
     });
@@ -188,11 +181,7 @@ const getUserExam = async (req, res) => {
 
 const updateUserExam = async (req, res) => {
   const { id } = req.params;
-  const {
-    userId,
-    examId,
-    ...rest
-  } = req.body;
+  const { userId, examId, ...rest } = req.body;
 
   try {
     // Obtener el registro de UserExam
@@ -203,22 +192,6 @@ const updateUserExam = async (req, res) => {
         .status(401)
         .json({ ok: false, msg: "Error con el id del User Examen" });
     }
-
-    // Obtener el usuario que creó el examen
-    // const createdByUser = await User.findByPk(userExam.createdBy, {
-    //   attributes: ["name", "lastname"],
-    // });
-
-    // Obtener el usuario que actualizó el examen
-    // const updatedByUser = await User.findByPk(updatedBy, {
-    //   attributes: ["name", "lastname"],
-    // });
-    // if (!updatedByUser) {
-    //   return res
-    //     .status(500)
-    //     .json({ ok: false, msg: "Usuario que actualizo no existe" });
-    // }
-
     // Obtener el usuario que realizó el examen
     const user = await User.findByPk(userId, {
       attributes: ["name", "lastname"],
@@ -231,7 +204,7 @@ const updateUserExam = async (req, res) => {
     await userExam.update({
       userId,
       examId,
-      ...rest
+      ...rest,
     });
 
     return res.status(200).json({
@@ -257,21 +230,36 @@ const updateUserExam = async (req, res) => {
 const deleteUserExam = async (req, res) => {
   const { id } = req.params;
   try {
-    const userExam = await UserExam.findOne({ where: { id } });
+    const userExam = await UserExam.findOne({
+      where: { id },
+      include: [
+        { model: User, as: "User", attributes: ["name", "lastname"] },
+        { model: Exam, as: "Exam", attributes: ["name"] },
+      ],
+      attributes: { exclude: ["userId", "examId"] },
+    });
     if (!userExam) {
       return res.status(401).json({
         ok: false,
         msg: "Error con el id del User Examen",
       });
     }
-    const [row, [updateUserExam]] = await UserExam.update(
-      { isActive: false },
-      { where: { id }, returning: true }
-    );
+    const [row] = await UserExam.update({ isActive: false }, { where: { id } });
+
     if (row > 0) {
+      const {User, Exam, ...rest} = userExam.toJSON();
+      const userId = userExam.User
+        ? `${userExam.User.name} ${userExam.User.lastname}`
+        : null;
+      const examId = userExam.Exam ? userExam.Exam.name : null;
+
       return res.status(200).json({
         ok: true,
-        userExam: { ...updateUserExam.dataValues },
+        userExam: {
+          ...rest,
+          userId,
+          examId,
+        },
         msg: "Eliminado correctamente",
       });
     } else {
