@@ -43,7 +43,7 @@ const User = Sequelize.define(
       allowNull: false,
       unique: {
         args: true,
-        msg: "La dni ya fue usada.",
+        msg: "La cédula ya fue usada.",
       },
       validate: {
         notEmpty: {

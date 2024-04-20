@@ -13,7 +13,7 @@ const getSeasons = async (req, res) => {
   } catch (error) {
     return res.status(500).json({
       ok: false,
-      msg: error.message
+      msg: error.message,
     });
   }
 };
@@ -43,9 +43,7 @@ const getSeason = async (req, res) => {
     }
     return res.status(200).json({ ok: true, season });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -67,9 +65,7 @@ const updateSeason = async (req, res) => {
       .status(200)
       .json({ ok: true, season, msg: "Actualizado correctamente" });
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 
@@ -84,14 +80,16 @@ const deleteSeason = async (req, res) => {
       });
     }
     const [row, [updateSeason]] = await Season.update(
-      { isActive: false },
+      { isActive: !season.isActive },
       { where: { id }, returning: true }
     );
     if (row > 0) {
       return res.status(200).json({
         ok: true,
         season: { ...updateSeason.dataValues },
-        msg: "Eliminado correctamente",
+        msg: !season.isActive
+          ? "Universidad activada correctamente"
+          : "Universidad inactivada correctamente",
       });
     } else {
       return res
@@ -99,9 +97,7 @@ const deleteSeason = async (req, res) => {
         .json({ ok: false, msg: "No se pudo eliminar la temporada" });
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json({ ok: false, msg: error.message });
+    return res.status(500).json({ ok: false, msg: error.message });
   }
 };
 

@@ -127,21 +127,25 @@ const deleteUser = async (req, res) => {
         msg: "Error con el id del usuario",
       });
     }
+    const universityName = _user.University ? _user.University.name : null;
+    const seasonName = _user.Season ? _user.Season.name : null;
 
-    const [row,[updateUser]] = await User.update(
+    const [row, [updateUser]] = await User.update(
       { isActive: !_user.isActive },
       { where: { id }, returning: true }
     );
     if (row > 0) {
-      const { University, Season, ...rest } = updateUser.toJSON();
-      const universityId = University ? University.name : null;
-      const seasonId = Season ? Season.name : null;
+      const updatedUser = {
+        ...updateUser.toJSON(),
+        universityId: universityName,
+        seasonId: seasonName,
+      };
       return res.status(200).json({
         ok: true,
-        user: { ...rest, universityId, seasonId },
+        user: updatedUser,
         msg: !_user.isActive
-          ? "El usuario ha sido activado correctamente"
-          : "El usuario ha sido inactivado correctamente",
+          ? "Usuario activado correctamente"
+          : "Usuario inactivado correctamente",
       });
     } else {
       return res

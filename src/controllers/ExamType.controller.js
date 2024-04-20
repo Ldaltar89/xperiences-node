@@ -77,14 +77,16 @@ const deleteExamType = async (req, res) => {
       });
     }
     const [row, [updateExamType]] = await ExamType.update(
-      { isActive: false },
+      { isActive: !examType.isActive},
       { where: { id }, returning: true }
     );
     if (row > 0) {
       return res.status(200).json({
         ok: true,
         examType: { ...updateExamType.dataValues },
-        msg: "Eliminado correctamente",
+        msg: !examType.isActive
+        ? "Tipo de Examen activado correctamente"
+        : "Tipo de Examen inactivado correctamente",
       });
     } else {
       return res

@@ -86,7 +86,7 @@ const deleteUniversity = async (req, res) => {
       });
     }
   const [row, [updateUniversity]] = await University.update(
-      { isActive: false },
+      { isActive: !university.isActive },
       { where: { id }, returning: true }
     );
     if (row > 0) {
@@ -95,7 +95,9 @@ const deleteUniversity = async (req, res) => {
         .json({
           ok: true,
           university: { ...updateUniversity.dataValues },
-          msg: "Eliminado correctamente",
+          msg: !university.isActive
+          ? "Temporada activada correctamente"
+          : "Temporada inactivada correctamente",
         });
     } else {
       return res

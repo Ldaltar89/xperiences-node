@@ -81,14 +81,16 @@ const deleteContract = async (req, res) => {
       });
     }
     const [row, [updateContract]] = await Contract.update(
-      { isActive: false },
+      { isActive: !contract.isActive },
       { where: { id }, returning: true }
     );
     if (row > 0) {
       return res.status(200).json({
         ok: true,
         contract: { ...updateContract.dataValues },
-        msg: "Eliminado correctamente",
+        msg: !contract.isActive
+        ? "Contrato activado correctamente"
+        : "Contrato inactivado correctamente",
       });
     } else {
       return res

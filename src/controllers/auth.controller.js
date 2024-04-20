@@ -104,7 +104,7 @@ const postVerificationEmail = async (req, res) => {
     }
     const token = await generarJWY(user.id, "10m");
     sendVerificationEmail(user, token);
-    return res.status(200).json({ ok: true, msg: "Mensaje enviado", token });
+    return res.status(200).json({ ok: true, msg: "Correo enviado", token });
   } catch (error) {
     return res.status(500).json({ ok: false, msg: error.message });
   }
