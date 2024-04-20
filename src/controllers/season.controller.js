@@ -88,8 +88,8 @@ const deleteSeason = async (req, res) => {
         ok: true,
         season: { ...updateSeason.dataValues },
         msg: !season.isActive
-          ? "Universidad activada correctamente"
-          : "Universidad inactivada correctamente",
+          ? "Temporada activada correctamente"
+          : "Temporada inactivada correctamente",
       });
     } else {
       return res

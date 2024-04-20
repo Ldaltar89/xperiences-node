@@ -96,8 +96,8 @@ const deleteUniversity = async (req, res) => {
           ok: true,
           university: { ...updateUniversity.dataValues },
           msg: !university.isActive
-          ? "Temporada activada correctamente"
-          : "Temporada inactivada correctamente",
+          ? "Universidad activada correctamente"
+          : "Universidad inactivada correctamente",
         });
     } else {
       return res
