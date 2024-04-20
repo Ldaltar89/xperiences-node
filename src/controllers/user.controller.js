@@ -128,12 +128,12 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    const [row] = await User.update(
+    const [row,[updateUser]] = await User.update(
       { isActive: !_user.isActive },
-      { where: { id } }
+      { where: { id }, returning: true }
     );
     if (row > 0) {
-      const { University, Season, ...rest } = _user.toJSON();
+      const { University, Season, ...rest } = updateUser.toJSON();
       const universityId = University ? University.name : null;
       const seasonId = Season ? Season.name : null;
       return res.status(200).json({
