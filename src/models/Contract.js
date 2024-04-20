@@ -24,20 +24,16 @@ const Contract = Sequelize.define("Contract", {
     type: DataTypes.STRING(255),
   },
   contract: {
-    type: DataTypes.STRING(4000),
+    type: DataTypes.STRING,
     allowNull: false,
     validate: {
       notEmpty: {
         msg: "El contrato es obligatorio.",
       },
-      len: {
-        args: [1, 4000],
-        msg: "La longitud del contenido del contrato debe estar entre 1 y 4000 caracteres.",
-      },
     },
   },
   seasonId: {
-    type: DataTypes.STRING(30),
+    type: DataTypes.STRING,
   },
   isActive: {
     type: DataTypes.BOOLEAN,

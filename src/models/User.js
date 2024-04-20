@@ -41,6 +41,10 @@ const User = Sequelize.define(
     dni: {
       type: DataTypes.STRING(20),
       allowNull: false,
+      unique: {
+        args: true,
+        msg: "La dni ya fue usada.",
+      },
       validate: {
         notEmpty: {
           msg: "El DNI es obligatorio.",

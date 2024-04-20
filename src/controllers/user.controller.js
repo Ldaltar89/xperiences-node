@@ -50,7 +50,7 @@ const createUser = async (req, res) => {
         .json({ ok: false, msg: "Faltan datos obligatorios." });
     }
     const newUser = await User.create(req.body);
-    const token = await generarJWY(newUser.id, "24h");
+    const token = await generarJWY(newUser.id, "10m");
 
     sendMail(newUser, token);
     return res
@@ -81,7 +81,7 @@ const getUser = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { id } = req.params;
-  const { password } = req.body;
+  const { password, ...userData } = req.body;
   try {
     const user = await User.findOne({
       where: { id },
@@ -93,12 +93,11 @@ const updateUser = async (req, res) => {
       });
     }
 
-    if (password) {
+    if (password && !bcrypt.compareSync(password, user.password)) {
       const hashedPassword = bcrypt.hashSync(password, bcrypt.genSaltSync());
-      req.body.password = hashedPassword;
+      userData.password = hashedPassword;
     }
-    user.set(req.body);
-    await user.save();
+    await user.update(userData);
     return res.status(200).json({
       ok: true,
       user,
