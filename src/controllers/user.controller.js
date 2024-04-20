@@ -111,7 +111,16 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const _user = await User.findOne({ where: { id } });
+    const _user = await User.findOne({
+      where: { id },
+      include: [
+        { model: University, as: "University", attributes: ["name"] },
+        { model: Season, as: "Season", attributes: ["name"] },
+      ],
+      attributes: {
+        exclude: ["universityId", "seasonId"],
+      },
+    });
     if (!_user) {
       return res.status(401).json({
         ok: false,
@@ -119,15 +128,20 @@ const deleteUser = async (req, res) => {
       });
     }
 
-    const [row, [updateUser]] = await User.update(
-      { isActive: false },
-      { where: { id }, returning: true }
+    const [row] = await User.update(
+      { isActive: !_user.isActive },
+      { where: { id } }
     );
     if (row > 0) {
+      const { University, Season, ...rest } = _user.toJSON();
+      const universityId = University ? University.name : null;
+      const seasonId = Season ? Season.name : null;
       return res.status(200).json({
         ok: true,
-        user: { ...updateUser.dataValues },
-        msg: "Eliminado correctamente",
+        user: { ...rest, universityId, seasonId },
+        msg: !_user.isActive
+          ? "El usuario ha sido activado correctamente"
+          : "El usuario ha sido inactivado correctamente",
       });
     } else {
       return res
